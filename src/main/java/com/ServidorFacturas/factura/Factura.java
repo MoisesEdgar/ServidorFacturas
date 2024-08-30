@@ -1,8 +1,11 @@
 package com.ServidorFacturas.factura;
 
+import com.ServidorFacturas.cliente.Cliente;
+import com.ServidorFacturas.partida.Partida;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Factura {
@@ -16,6 +19,29 @@ public class Factura {
     private Date fechaExpedicion;
     private Double subtotal;
     private Double total;
+
+    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL)
+    private List<Partida> partidas;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private Cliente cliente;
+
+    public List<Partida> getPartidas() {
+        return partidas;
+    }
+
+    public void setPartidas(List<Partida> partidas) {
+        this.partidas = partidas;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
 
     public Long getId() {
         return id;

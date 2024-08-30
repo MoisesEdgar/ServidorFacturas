@@ -1,6 +1,9 @@
 package com.ServidorFacturas.cliente;
 
+import com.ServidorFacturas.factura.Factura;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 
 @Entity
@@ -13,6 +16,17 @@ public class Cliente {
     private String nombre;
     private String telefono;
     private String direccion;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    private List<Factura> facturas;
+
+    public List<Factura> getFacturas() {
+        return facturas;
+    }
+
+    public void setFacturas(List<Factura> facturas) {
+        this.facturas = facturas;
+    }
 
     public Long getId() {
         return id;

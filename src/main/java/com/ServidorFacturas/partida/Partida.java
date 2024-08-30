@@ -1,5 +1,6 @@
 package com.ServidorFacturas.partida;
 
+import com.ServidorFacturas.factura.Factura;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,6 +14,18 @@ public class Partida {
     private String nombreArticulo;
     private Integer cantidad;
     private Double precio;
+
+    @ManyToOne
+    @JoinColumn(name = "factura_id", nullable = false)
+    private Factura factura;
+
+    public Factura getFactura() {
+        return factura;
+    }
+
+    public void setFactura(Factura factura) {
+        this.factura = factura;
+    }
 
     public Long getId() {
         return id;
