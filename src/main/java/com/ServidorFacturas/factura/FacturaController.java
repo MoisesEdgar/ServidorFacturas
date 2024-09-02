@@ -15,27 +15,83 @@ public class FacturaController {
     @Autowired
     private FacturaRepository repoFactura;
 
+    @Autowired
+    private FacturaService serviceFactura;
 
+    @GetMapping
+    public List<FacturaDTO> getAll(){
+        List<Factura> facturas = repoFactura.findAll();
+        return facturas.stream().map(factura -> toDTO(factura)).collect(Collectors.toList());
+    }
 
     @GetMapping("/{id}")
-    public Factura getById(@PathVariable Long id) {
-        Factura entidad = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No encontre la factura con el id " + id));
-        return entidad;
+    public FacturaDTO getByID(@PathVariable Long id){
+        Factura entidad = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
+        return toDTO(entidad);
     }
-
 
     @PostMapping
-    public Factura save (@RequestBody Factura factura){
-        return repoFactura.save(factura);
+    public FacturaDTO save(@RequestBody FacturaDTO facturaDTO){
+        Factura factura = toEntity(facturaDTO);
+        Factura guardada = serviceFactura.guardar(factura);
+        return toDTO(guardada);
     }
 
-    @DeleteMapping("/{Id}")
-    public String delete(@PathVariable Long id){
-            repoFactura.deleteById(id);
-            return "se elimino la factura con el id" + id;
+    @DeleteMapping("/{id}")
+    public String deleteClienteById(@PathVariable Long id){
+        repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
+        repoFactura.deleteById(id);
+        return "Se elinimo la factura con id " + id;
     }
 
 
+    private FacturaDTO toDTO(Factura factura){
+       FacturaDTO dto = new FacturaDTO();
+        dto.id = factura.getId();
+        dto.folio = factura.getFolio();
+        dto.fecha_expedicion = factura.getFechaExpedicion();
+        dto.subtotal = factura.getSubtotal();
+        dto.total = factura.getTotal();
+        dto.cliente_id = factura.getClienteId();
+        if (factura.getPartidas() != null){
+            dto.partidas = new ArrayList<>();
 
+            for(Partida partida : factura.getPartidas()){
+                PartidaDTO pDTO = new PartidaDTO();
+                pDTO.id = partida.getId();
+                pDTO.nombre_articulo = partida.getNombreArticulo();
+                pDTO.cantidad = partida.getCantidad();
+                pDTO.precio = partida.getPrecio();
+                pDTO.factura_id = factura.getId();
 
+                dto.partidas.add(pDTO);
+            }
+        }
+        return dto;
+    }
+
+    private Factura toEntity(FacturaDTO dto){
+        Factura factura = new Factura();
+        factura.setId(dto.id);
+        factura.setFolio(dto.folio);
+        factura.setFechaExpedicion(dto.fecha_expedicion);
+        factura.setSubtotal(dto.subtotal);
+        factura.setTotal(dto.total);
+        factura.setClienteId(dto.cliente_id);
+
+        if(dto.partidas != null){
+            factura.setPartidas(new ArrayList<>());
+
+            for (PartidaDTO pDTO : dto.partidas){
+                Partida partida = new Partida();
+                partida.setId(pDTO.id);
+                partida.setNombreArticulo(pDTO.nombre_articulo);
+                partida.setCantidad(pDTO.cantidad);
+                partida.setPrecio(pDTO.precio);
+
+                factura.getPartidas().add(partida);
+            }
+        }
+        return factura;
+    }
 }
