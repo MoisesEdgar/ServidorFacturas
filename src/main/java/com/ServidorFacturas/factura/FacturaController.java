@@ -37,6 +37,14 @@ public class FacturaController {
         return toDTO(guardada);
     }
 
+    @PutMapping("/{id}")
+    public FacturaDTO updateFactura(@RequestBody FacturaDTO facturaDTO, @PathVariable Long id){
+        Factura factura = toEntity(facturaDTO);
+        Factura modificada = serviceFactura.updateFactura(factura ,id);
+        return toDTO(modificada);
+    }
+
+
     @DeleteMapping("/{id}")
     public String deleteClienteById(@PathVariable Long id){
         repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));

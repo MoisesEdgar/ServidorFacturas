@@ -37,12 +37,14 @@ public class ClienteController {
         return toDTO(guardada);
     }
 
-    @DeleteMapping("/{id}")
+  /*  @DeleteMapping("/{id}")
     public String deleteClienteById(@PathVariable Long id){
         repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el Cliente con el id " + id));
         repoCliente.deleteById(id);
         return "Se elinimo al cliente con id " + id;
     }
+
+*/
 
     private ClienteDTO toDTO(Cliente cliente){
         ClienteDTO dto = new ClienteDTO();

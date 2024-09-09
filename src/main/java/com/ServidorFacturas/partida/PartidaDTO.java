@@ -1,8 +1,5 @@
 package com.ServidorFacturas.partida;
 
-import com.ServidorFacturas.factura.Factura;
-import jakarta.persistence.*;
-
 public class PartidaDTO {
     public Long id;
     public String nombre_articulo;

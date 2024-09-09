@@ -1,10 +1,14 @@
 package com.ServidorFacturas.factura;
 
 import com.ServidorFacturas.partida.Partida;
+import com.ServidorFacturas.partida.PartidaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -64,5 +68,65 @@ public class FacturaService {
         factura.setTotal(total);
 
         return repoFactura.save(factura);
+    }
+
+
+    //PUT
+    public Factura updateFactura(Factura factura, Long FacturaId) {
+        Factura depDB = repoFactura.findById(FacturaId).get();
+
+        if (Objects.nonNull(
+                factura.getFolio()) && !"".equalsIgnoreCase(factura.getFolio())){
+            depDB.setFolio(factura.getFolio());
+        }
+
+        if (Objects.nonNull(
+                factura.getFechaExpedicion())){
+            depDB.setFechaExpedicion(
+                    factura.getFechaExpedicion());
+        }
+
+        if (Objects.nonNull(
+                factura.getSubtotal())){
+            depDB.setSubtotal(
+                    factura.getSubtotal());
+        }
+
+        if (Objects.nonNull(
+                factura.getTotal())){
+            depDB.setTotal(
+                    factura.getTotal());
+        }
+
+        if (Objects.nonNull(
+                factura.getClienteId())){
+            depDB.setClienteId(
+                    factura.getClienteId());
+        }
+
+
+        for (Partida partida : factura.getPartidas()) {
+
+            if(Objects.nonNull(
+                    partida.getNombreArticulo())){
+                partida.setNombreArticulo(
+                        partida.getNombreArticulo());
+            }
+
+            if(Objects.nonNull(
+                    partida.getCantidad())){
+                partida.setCantidad(
+                        partida.getCantidad());
+            }
+
+            if (Objects.nonNull(
+                    partida.getPrecio())){
+                partida.setPrecio(
+                        partida.getPrecio());
+            }
+
+        }
+
+        return repoFactura.save(depDB);
     }
 }

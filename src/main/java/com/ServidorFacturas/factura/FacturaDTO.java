@@ -1,6 +1,5 @@
 package com.ServidorFacturas.factura;
 
-import com.ServidorFacturas.cliente.Cliente;
 import com.ServidorFacturas.partida.PartidaDTO;
 
 import java.util.Date;
