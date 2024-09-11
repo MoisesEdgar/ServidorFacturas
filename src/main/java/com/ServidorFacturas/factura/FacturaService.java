@@ -71,9 +71,13 @@ public class FacturaService {
     }
 
 
+
+
+
+
     //PUT
-    public Factura updateFactura(Factura factura, Long FacturaId) {
-        Factura depDB = repoFactura.findById(FacturaId).get();
+    public Factura updateFactura(Factura factura, Long id) {
+        Factura depDB = repoFactura.findById(id).orElseThrow(()-> new RuntimeException("Factura no encontrada"));
 
         if (Objects.nonNull(
                 factura.getFolio()) && !"".equalsIgnoreCase(factura.getFolio())){
@@ -105,28 +109,34 @@ public class FacturaService {
         }
 
 
-        for (Partida partida : factura.getPartidas()) {
 
-            if(Objects.nonNull(
-                    partida.getNombreArticulo())){
-                partida.setNombreArticulo(
-                        partida.getNombreArticulo());
-            }
+        if (Objects.nonNull(factura.getPartidas()) && !factura.getPartidas().isEmpty()) {
+            for (Partida partida : factura.getPartidas()) {
 
-            if(Objects.nonNull(
-                    partida.getCantidad())){
-                partida.setCantidad(
-                        partida.getCantidad());
-            }
+                if(Objects.nonNull(
+                        partida.getNombreArticulo())){
+                    partida.setNombreArticulo(
+                            partida.getNombreArticulo());
+                }
 
-            if (Objects.nonNull(
-                    partida.getPrecio())){
-                partida.setPrecio(
-                        partida.getPrecio());
+                if(Objects.nonNull(
+                        partida.getCantidad())){
+                    partida.setCantidad(
+                            partida.getCantidad());
+                }
+
+                if (Objects.nonNull(
+                        partida.getPrecio())){
+                    partida.setPrecio(
+                            partida.getPrecio());
+                }
+                partida.setFactura(depDB);
+                depDB.getPartidas().add(partida);
+
             }
 
         }
-
+        
         return repoFactura.save(depDB);
     }
 }
