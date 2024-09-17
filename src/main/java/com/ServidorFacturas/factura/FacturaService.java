@@ -59,10 +59,10 @@ public class FacturaService {
         total = subtotal + subtotal * 0.16;
 
         //SUBTOTAL
-        factura.setSubtotal(subtotal);
+        factura.setSubtotal(Math.round(subtotal * 100)/100d);
 
         //TOTAL
-        factura.setTotal(total);
+        factura.setTotal(Math.round(total * 100)/100d);
 
         return repoFactura.save(factura);
     }
