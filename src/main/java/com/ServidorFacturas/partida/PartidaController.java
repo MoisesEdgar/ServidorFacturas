@@ -14,9 +14,9 @@ public class PartidaController {
 
     @DeleteMapping("/{id}")
     private String deletepartidaById(@PathVariable Long id){
-        repoPartida.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
+        repoPartida.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la partida con el id " + id));
         repoPartida.deleteById(id);
-        return "Se elinimo la factura con id " + id;
+        return "Se elinimo la partida con id " + id;
     }
 
 }

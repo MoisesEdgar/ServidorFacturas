@@ -1,13 +1,10 @@
 package com.ServidorFacturas.factura;
 
 import com.ServidorFacturas.partida.Partida;
-import com.ServidorFacturas.partida.PartidaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 
@@ -70,11 +67,6 @@ public class FacturaService {
         return repoFactura.save(factura);
     }
 
-
-
-
-
-
     //PUT
     public Factura updateFactura(Factura factura, Long id) {
         Factura depDB = repoFactura.findById(id).orElseThrow(()-> new RuntimeException("Factura no encontrada"));
@@ -136,7 +128,7 @@ public class FacturaService {
             }
 
         }
-        
+
         return repoFactura.save(depDB);
     }
 }

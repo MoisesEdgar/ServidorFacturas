@@ -1,5 +1,7 @@
 package com.ServidorFacturas.cliente;
 
+import com.ServidorFacturas.factura.Factura;
+import com.ServidorFacturas.factura.FacturaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,13 @@ public class ClienteController {
         Cliente cliente = toEntity(clienteDTO);
         Cliente guardada = serviceCliente.guardar(cliente);
         return toDTO(guardada);
+    }
+
+    @PutMapping("/{id}")
+    public ClienteDTO updateCliente(@RequestBody ClienteDTO clienteDTO, @PathVariable Long id){
+        Cliente cliente = toEntity(clienteDTO);
+        Cliente modificada = serviceCliente.updateCleinte(cliente ,id);
+        return toDTO(modificada);
     }
 
   /*  @DeleteMapping("/{id}")

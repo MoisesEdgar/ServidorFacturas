@@ -1,9 +1,12 @@
 package com.ServidorFacturas.cliente;
 
+import com.ServidorFacturas.factura.Factura;
+import com.ServidorFacturas.partida.Partida;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Service
 public class ClienteService {
@@ -30,4 +33,32 @@ public class ClienteService {
 
         return repoCliente.save(cliente);
     }
+
+    public Cliente updateCleinte(Cliente cliente, Long id){
+        Cliente depDB = repoCliente.findById(id).orElseThrow(()-> new RuntimeException("Cliente no encontrada"));
+
+        if (Objects.nonNull(
+                cliente.getCodigo()) && !"".equalsIgnoreCase(cliente.getCodigo())){
+            depDB.setCodigo(cliente.getCodigo());
+        }
+
+        if (Objects.nonNull(
+                cliente.getNombre()) && !"".equalsIgnoreCase(cliente.getNombre())){
+            depDB.setNombre(cliente.getNombre());
+        }
+
+        if (Objects.nonNull(
+                cliente.getTelefono()) && !"".equalsIgnoreCase(cliente.getTelefono())){
+            depDB.setTelefono(cliente.getTelefono());
+        }
+
+        if (Objects.nonNull(
+                cliente.getDireccion()) && !"".equalsIgnoreCase(cliente.getDireccion())){
+            depDB.setDireccion(cliente.getDireccion());
+        }
+
+        return repoCliente.save(depDB);
+
+    }
 }
+
