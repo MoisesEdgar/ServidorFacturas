@@ -58,4 +58,5 @@ public class Partida {
     public void setPrecio(Double precio) {
         this.precio = precio;
     }
+
 }
