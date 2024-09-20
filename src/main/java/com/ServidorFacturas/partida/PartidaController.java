@@ -1,8 +1,11 @@
 package com.ServidorFacturas.partida;
 
-import com.ServidorFacturas.cliente.ClienteDTO;
+import com.ServidorFacturas.factura.Factura;
+import com.ServidorFacturas.factura.FacturaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/partidas")
@@ -13,7 +16,9 @@ public class PartidaController {
     @Autowired
     private PartidaService servicePartida;
 
-/*
+    @Autowired
+    private FacturaRepository repoFactura;
+
     @PostMapping
     private PartidaDTO save(@RequestBody PartidaDTO partidaDTO){
         Partida partida = toEntity(partidaDTO);
@@ -21,7 +26,7 @@ public class PartidaController {
 
         return toDTO(guardada);
     }
-    */
+
     @DeleteMapping("/{id}")
     private String deletepartidaById(@PathVariable Long id){
         repoPartida.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la partida con el id " + id));
@@ -31,7 +36,7 @@ public class PartidaController {
 
 
 
-/*
+
     private PartidaDTO toDTO(Partida partida){
         PartidaDTO dto = new PartidaDTO();
         dto.id = partida.getId();
@@ -49,9 +54,13 @@ public class PartidaController {
         partida.setNombreArticulo(dto.nombre_articulo);
         partida.setCantidad(dto.cantidad);
         partida.setPrecio(dto.precio);
-
+        Optional<Factura> factura = repoFactura.findById(dto.factura_id);
+        if (factura.isEmpty()) {
+            throw new RuntimeException("Factura no encontrada");
+        }
+        partida.setFactura(factura.orElse(null));
 
         return partida;
     }
-*/
+
 }
