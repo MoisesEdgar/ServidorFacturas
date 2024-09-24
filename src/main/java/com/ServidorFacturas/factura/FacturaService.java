@@ -64,7 +64,11 @@ public class FacturaService {
         //TOTAL
         factura.setTotal(Math.round(total * 100)/100d);
 
-        return repoFactura.save(factura);
+        Factura facturaGuardada = repoFactura.save(factura);
+        String folioConId = facturaGuardada.getFolio() + "-" + facturaGuardada.getId();
+        facturaGuardada.setFolio(folioConId);
+        return repoFactura.save(facturaGuardada);
+
     }
 
     //PUT
