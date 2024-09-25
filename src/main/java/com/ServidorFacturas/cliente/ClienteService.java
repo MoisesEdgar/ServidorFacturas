@@ -1,8 +1,10 @@
 package com.ServidorFacturas.cliente;
+import com.ServidorFacturas.factura.Factura;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -30,26 +32,52 @@ public class ClienteService {
             throw new RuntimeException("No se especifico la direccion del cliente");
         }
 
+        validarCodigoCliente(cliente.getCodigo());
 
 
-        Cliente clienteGuardado = repoCliente.save(cliente);
+        return repoCliente.save(cliente);
+    }
 
-        String con = String.valueOf(clienteGuardado.getId());
+    public void validarCodigoCliente(String codigo){
 
-        String ceros ="";
-        for (int i = con.length(); i < 3;) {
-            i++;
-            ceros = ceros + "0";
+        String codigoFinal = "";
+        if (codigo.matches("^C-\\d\\d\\d")) {
+            List<Cliente> clientes = repoCliente.findAll();
+
+            for (Cliente cliente : clientes){
+                codigoFinal = cliente.getCodigo();
+            }
+
+            if(codigoFinal.isEmpty()){
+                if(codigo.equalsIgnoreCase("C-001")){
+                }else{
+                    throw new RuntimeException("El formato del codigo no es valido. La nuemracion debe ser: C-001");
+                }
+            }else{
+                Integer intCodigo = getNumeracion(codigo);
+                Integer intCodigoFinal = getNumeracion(codigoFinal);
+
+                if(intCodigo != (intCodigoFinal + 1)){
+                    String ceros = "";
+
+                    for (int i = String.valueOf(intCodigoFinal).length(); i < 3;) {
+                        i++;
+                        ceros = ceros + "0";
+                    }
+
+                    throw new RuntimeException("El formato del codigo no es valido. La nuemracion debe ser C-" + ceros + (intCodigoFinal + 1));
+                }
+            }
+        }else{
+            throw new RuntimeException("El formato del codigo no es valido debe ser: C-000");
         }
 
-        String codigoConId = clienteGuardado.getCodigo() + "-" + ceros + clienteGuardado.getId();
 
+    }
 
-
-
-        clienteGuardado.setCodigo(codigoConId);
-
-        return repoCliente.save(clienteGuardado);
+    public Integer getNumeracion(String codigo){
+        String[] salto = codigo.split("-");
+        return Integer.parseInt(salto[1]);
     }
 
     public Cliente updateCleinte(Cliente cliente, Long id){

@@ -1,12 +1,11 @@
 package com.ServidorFacturas.factura;
-
 import com.ServidorFacturas.partida.Partida;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
-
 
 @Service
 public class FacturaService {
@@ -64,11 +63,50 @@ public class FacturaService {
         //TOTAL
         factura.setTotal(Math.round(total * 100)/100d);
 
-        Factura facturaGuardada = repoFactura.save(factura);
-        String folioConId = facturaGuardada.getFolio() + "-" + facturaGuardada.getId();
-        facturaGuardada.setFolio(folioConId);
-        return repoFactura.save(facturaGuardada);
+        validarFolio(factura.getFolio());
 
+
+
+        return repoFactura.save(factura);
+    }
+
+    public void validarFolio(String folio){
+        String folioFinal = "";
+        if (folio.matches("^F-\\d\\d\\d")) {
+            List<Factura> facturas = repoFactura.findAll();
+
+            for (Factura factura : facturas){
+               folioFinal = factura.getFolio();
+            }
+
+            if(folioFinal.isEmpty()){
+                if(folio.equalsIgnoreCase("F-001")){
+                }else{
+                    throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser: F-001");
+                }
+            }else{
+                Integer intFolio = getNumeracion(folio);
+                Integer intFolioFinal = getNumeracion(folioFinal);
+
+                if(intFolio != (intFolioFinal + 1)){
+                    String ceros = "";
+
+                        for (int i = String.valueOf(intFolioFinal).length(); i < 3;) {
+                            i++;
+                            ceros = ceros + "0";
+                        }
+
+                    throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser F-" + ceros + (intFolioFinal + 1));
+                }
+            }
+        }else{
+            throw new RuntimeException("El formato del folio no es valido debe ser: F-000");
+        }
+    }
+    
+    public Integer getNumeracion(String folio){
+        String[] salto = folio.split("-");
+        return Integer.parseInt(salto[1]);
     }
 
     //PUT
@@ -128,8 +166,6 @@ public class FacturaService {
                 }
                 partida.setFactura(depDB);
                 depDB.getPartidas().add(partida);
-
-
             }
 
         }
