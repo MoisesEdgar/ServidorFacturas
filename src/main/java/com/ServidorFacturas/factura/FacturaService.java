@@ -176,25 +176,18 @@ public class FacturaService {
                     }
                 }
 
-
-
-
-
+                subtotal += cantidad * precio;
                 partida.setFactura(depDB);
                 depDB.getPartidas().add(partida);
 
-
-
-
-                subtotal += cantidad * precio;
             }
 
             total = subtotal + subtotal * 0.16;
             //SUBTOTAL
-            factura.setSubtotal(Math.round(subtotal * 100)/100d);
-            //TOTAL
-            factura.setTotal(Math.round(total * 100)/100d);
 
+
+            depDB.setSubtotal(Math.round(subtotal * 100)/100d);
+            depDB.setTotal(Math.round(total * 100)/100d);
         }
 
 
