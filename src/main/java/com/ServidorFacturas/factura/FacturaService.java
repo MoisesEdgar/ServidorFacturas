@@ -13,6 +13,8 @@ public class FacturaService {
     @Autowired
     private FacturaRepository repoFactura;
 
+
+    //AGREGA
     public Factura guardar(Factura factura){
         Double subtotal = 0.0;
         Double total = 0.0;
@@ -109,13 +111,12 @@ public class FacturaService {
         return Integer.parseInt(salto[1]);
     }
 
+
+
+
     //PUT
     public Factura updateFactura(Factura factura, Long id) {
         Factura depDB = repoFactura.findById(id).orElseThrow(()-> new RuntimeException("Factura no encontrada"));
-        Double subtotal = 0.0;
-        Double total = 0.0;
-        Integer cantidad = 0;
-        Double precio = 0.0;
 
         if (Objects.nonNull(
                 factura.getFolio()) && !"".equalsIgnoreCase(factura.getFolio())){
@@ -147,8 +148,6 @@ public class FacturaService {
         }
 
 
-
-        if (Objects.nonNull(factura.getPartidas()) && !factura.getPartidas().isEmpty()) {
             for (Partida partida : factura.getPartidas()) {
 
                 if(Objects.nonNull(
@@ -161,7 +160,6 @@ public class FacturaService {
                     if(partida.getCantidad() <= 0){
                         throw new RuntimeException("La cantidad debe ser mayor a 0");
                     }else{
-                        cantidad = partida.getCantidad();
                         partida.setCantidad(partida.getCantidad());
                     }
 
@@ -171,26 +169,39 @@ public class FacturaService {
                     if(partida.getPrecio() <=0){
                         throw new RuntimeException("El precio debe ser mayor o igual a 0.1");
                     }else{
-                        precio = partida.getPrecio();
                         partida.setPrecio(partida.getPrecio());
                     }
                 }
 
-                subtotal += cantidad * precio;
                 partida.setFactura(depDB);
                 depDB.getPartidas().add(partida);
 
             }
-
-            total = subtotal + subtotal * 0.16;
-            //SUBTOTAL
-
-
-            depDB.setSubtotal(Math.round(subtotal * 100)/100d);
-            depDB.setTotal(Math.round(total * 100)/100d);
-        }
-
-
         return repoFactura.save(depDB);
     }
+
+    public void calcularTotales(Long id){
+        Factura factura = repoFactura.findById(id).orElseThrow(()-> new RuntimeException("Factura no encontrada"));
+        Double subtotal = 0.0;
+        Double total = 0.0;
+        Integer cantidad = 0;
+        Double precio = 0.0;
+
+        if (Objects.nonNull(factura.getPartidas()) && !factura.getPartidas().isEmpty()) {
+            for (Partida partida : factura.getPartidas()) {
+
+                cantidad = partida.getCantidad();
+                precio = partida.getPrecio();
+
+                subtotal += cantidad * precio;
+            }
+            total = subtotal + subtotal * 0.16;
+
+            factura.setSubtotal(Math.round(subtotal * 100)/100d);
+            factura.setTotal(Math.round(total * 100)/100d);
+
+        }
+        repoFactura.save(factura);
+    }
 }
+
