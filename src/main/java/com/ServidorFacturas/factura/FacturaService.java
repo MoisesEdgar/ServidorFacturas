@@ -42,6 +42,7 @@ public class FacturaService {
 
             //CANTIDAD
             Integer cantidad = partida.getCantidad();
+
             if(cantidad <= 0){
                 throw new RuntimeException("La cantidad debe ser mayor a 0");
             }
@@ -118,33 +119,16 @@ public class FacturaService {
     public Factura updateFactura(Factura factura, Long id) {
         Factura depDB = repoFactura.findById(id).orElseThrow(()-> new RuntimeException("Factura no encontrada"));
 
-        if (Objects.nonNull(
-                factura.getFolio()) && !"".equalsIgnoreCase(factura.getFolio())){
+        if (Objects.nonNull(factura.getFolio()) && !"".equalsIgnoreCase(factura.getFolio())){
             depDB.setFolio(factura.getFolio());
         }
 
-        if (Objects.nonNull(
-                factura.getFechaExpedicion())){
-            depDB.setFechaExpedicion(
-                    factura.getFechaExpedicion());
+        if (Objects.nonNull(factura.getFechaExpedicion())){
+            depDB.setFechaExpedicion(factura.getFechaExpedicion());
         }
 
-        if (Objects.nonNull(
-                factura.getSubtotal())){
-            depDB.setSubtotal(
-                    factura.getSubtotal());
-        }
-
-        if (Objects.nonNull(
-                factura.getTotal())){
-            depDB.setTotal(
-                    factura.getTotal());
-        }
-
-        if (Objects.nonNull(
-                factura.getClienteId())){
-            depDB.setClienteId(
-                    factura.getClienteId());
+        if (Objects.nonNull(factura.getClienteId())){
+            depDB.setClienteId(factura.getClienteId());
         }
 
 
@@ -172,11 +156,11 @@ public class FacturaService {
                         partida.setPrecio(partida.getPrecio());
                     }
                 }
-
                 partida.setFactura(depDB);
                 depDB.getPartidas().add(partida);
 
             }
+
         return repoFactura.save(depDB);
     }
 

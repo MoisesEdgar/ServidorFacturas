@@ -28,7 +28,10 @@ public class PartidaController {
         Partida partida = toEntity(partidaDTO);
         Partida guardada = servicePartida.guardar(partida);
         Long idFactura = servicePartida.getIdFactura(partida.getId());
-        serviceFactura.calcularTotales(idFactura);
+        serviceFactura
+
+
+                .calcularTotales(idFactura);
         return toDTO(guardada);
     }
 
