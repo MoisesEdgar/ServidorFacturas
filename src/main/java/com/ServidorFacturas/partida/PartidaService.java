@@ -1,11 +1,8 @@
 package com.ServidorFacturas.partida;
 
-import com.ServidorFacturas.factura.Factura;
 import com.ServidorFacturas.factura.FacturaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 
 @Service

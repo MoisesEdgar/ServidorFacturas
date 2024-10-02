@@ -47,7 +47,7 @@ public class FacturaController {
 
 
     @DeleteMapping("/{id}")
-    public String deleteClienteById(@PathVariable Long id){
+    public String deleteFacturaById(@PathVariable Long id){
         repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
         repoFactura.deleteById(id);
         return "Se elinimo la factura con id " + id;

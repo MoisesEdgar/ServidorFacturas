@@ -23,15 +23,16 @@ public class PartidaController {
     @Autowired
     private FacturaService serviceFactura;
 
+
+
+
+
     @PostMapping
     private PartidaDTO save(@RequestBody PartidaDTO partidaDTO){
         Partida partida = toEntity(partidaDTO);
         Partida guardada = servicePartida.guardar(partida);
         Long idFactura = servicePartida.getIdFactura(partida.getId());
-        serviceFactura
-
-
-                .calcularTotales(idFactura);
+        serviceFactura.calcularTotales(idFactura);
         return toDTO(guardada);
     }
 

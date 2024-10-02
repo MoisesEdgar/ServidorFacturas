@@ -1,8 +1,11 @@
 package com.ServidorFacturas.factura;
 import com.ServidorFacturas.partida.Partida;
+import com.ServidorFacturas.partida.PartidaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -12,6 +15,8 @@ public class FacturaService {
 
     @Autowired
     private FacturaRepository repoFactura;
+    @Autowired
+    private PartidaRepository repoPartida;
 
 
     //AGREGA
@@ -112,58 +117,6 @@ public class FacturaService {
         return Integer.parseInt(salto[1]);
     }
 
-
-
-
-    //PUT
-    public Factura updateFactura(Factura factura, Long id) {
-        Factura depDB = repoFactura.findById(id).orElseThrow(()-> new RuntimeException("Factura no encontrada"));
-
-        if (Objects.nonNull(factura.getFolio()) && !"".equalsIgnoreCase(factura.getFolio())){
-            depDB.setFolio(factura.getFolio());
-        }
-
-        if (Objects.nonNull(factura.getFechaExpedicion())){
-            depDB.setFechaExpedicion(factura.getFechaExpedicion());
-        }
-
-        if (Objects.nonNull(factura.getClienteId())){
-            depDB.setClienteId(factura.getClienteId());
-        }
-
-
-            for (Partida partida : factura.getPartidas()) {
-
-                if(Objects.nonNull(
-                        partida.getNombreArticulo())){
-                    partida.setNombreArticulo(
-                            partida.getNombreArticulo());
-                }
-
-                if(Objects.nonNull(partida.getCantidad())){
-                    if(partida.getCantidad() <= 0){
-                        throw new RuntimeException("La cantidad debe ser mayor a 0");
-                    }else{
-                        partida.setCantidad(partida.getCantidad());
-                    }
-
-                }
-
-                if (Objects.nonNull(partida.getPrecio())){
-                    if(partida.getPrecio() <=0){
-                        throw new RuntimeException("El precio debe ser mayor o igual a 0.1");
-                    }else{
-                        partida.setPrecio(partida.getPrecio());
-                    }
-                }
-                partida.setFactura(depDB);
-                depDB.getPartidas().add(partida);
-
-            }
-
-        return repoFactura.save(depDB);
-    }
-
     public void calcularTotales(Long id){
         Factura factura = repoFactura.findById(id).orElseThrow(()-> new RuntimeException("Factura no encontrada"));
         Double subtotal = 0.0;
@@ -187,5 +140,98 @@ public class FacturaService {
         }
         repoFactura.save(factura);
     }
+
+
+
+
+
+
+
+    public Factura updateFactura(Factura factura, Long id) {
+        Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
+        List<Partida> partidasActuales = depDB.getPartidas();
+        List<Partida> partidasActualizadas = new ArrayList<>();
+
+        for (Partida partida : factura.getPartidas()) {
+            if (partida.getId() != null) {
+
+                Partida partidaExistente = partidasActuales.stream()
+                        .filter(partidaActual -> partidaActual.getId().equals(partida.getId()))
+                        .findFirst()
+                        .orElse(null);
+
+
+                if (partidaExistente != null) {
+
+                    if (Objects.nonNull(partida.getNombreArticulo())) {
+                        partidaExistente.setNombreArticulo(partida.getNombreArticulo());
+                    } else {
+                        throw new RuntimeException("No se especifico un nombre");
+                    }
+
+                    if (Objects.nonNull(partida.getCantidad()) && partida.getCantidad() > 0) {
+                        partidaExistente.setCantidad(partida.getCantidad());
+                    } else {
+                        throw new RuntimeException("La cantidad debe ser mayor a 0");
+                    }
+
+                    if (Objects.nonNull(partida.getPrecio()) && partida.getPrecio() >= 0.1) {
+                        partidaExistente.setPrecio(partida.getPrecio());
+                    } else {
+                        throw new RuntimeException("El precio debe ser mayor o igual a 0.1");
+                    }
+
+                    partidasActualizadas.add(partidaExistente);
+                }
+            } else {
+                partida.setFactura(depDB);
+                partidasActualizadas.add(partida);
+
+            }
+        }
+
+
+//        for (Partida partida : factura.getPartidas()) {
+//            Partida partidaExistente = partidasActuales.stream()
+//                    .filter(partidaActual-> partidaActual.getId().equals(partida.getId()))
+//                    .findFirst()
+//                    .orElse(null);
+//
+//            if (partidaExistente == null) {
+//                repoPartida.deleteById(partida.getId());
+//            }
+//        }
+
+        depDB.setPartidas(partidasActualizadas);
+        return repoFactura.save(depDB);
+    }
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
