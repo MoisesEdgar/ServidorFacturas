@@ -1,4 +1,6 @@
 package com.ServidorFacturas.factura;
+import com.ServidorFacturas.cliente.Cliente;
+import com.ServidorFacturas.cliente.ClienteRepository;
 import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ public class FacturaService {
     private FacturaRepository repoFactura;
     @Autowired
     private PartidaRepository repoPartida;
+    @Autowired
+    private ClienteRepository repoCliente;
 
 
     //AGREGA
@@ -33,6 +37,9 @@ public class FacturaService {
         //ID_CLIENTE
         if(factura.getClienteId() == null){
             throw new RuntimeException("No se especifico el id del cliente");
+        }else{
+           Long id = Integer.toUnsignedLong(factura.getClienteId());
+           repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el Cliente con el id " + id));
         }
 
         //PARTIDAS

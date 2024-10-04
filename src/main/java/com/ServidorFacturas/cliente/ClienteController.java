@@ -23,7 +23,7 @@ public class ClienteController {
                 .map(cliente -> toDTO(cliente))
                 .collect(Collectors.toList());
     }
-    
+
 
     @PostMapping
     public ClienteDTO save(@RequestBody ClienteDTO clienteDTO){
