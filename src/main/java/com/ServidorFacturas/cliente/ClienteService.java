@@ -1,5 +1,4 @@
 package com.ServidorFacturas.cliente;
-import com.ServidorFacturas.factura.Factura;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,33 +77,6 @@ public class ClienteService {
     public Integer getNumeracion(String codigo){
         String[] salto = codigo.split("-");
         return Integer.parseInt(salto[1]);
-    }
-
-    public Cliente updateCleinte(Cliente cliente, Long id){
-        Cliente depDB = repoCliente.findById(id).orElseThrow(()-> new RuntimeException("Cliente no encontrada"));
-
-        if (Objects.nonNull(
-                cliente.getCodigo()) && !"".equalsIgnoreCase(cliente.getCodigo())){
-            depDB.setCodigo(cliente.getCodigo());
-        }
-
-        if (Objects.nonNull(
-                cliente.getNombre()) && !"".equalsIgnoreCase(cliente.getNombre())){
-            depDB.setNombre(cliente.getNombre());
-        }
-
-        if (Objects.nonNull(
-                cliente.getTelefono()) && !"".equalsIgnoreCase(cliente.getTelefono())){
-            depDB.setTelefono(cliente.getTelefono());
-        }
-
-        if (Objects.nonNull(
-                cliente.getDireccion()) && !"".equalsIgnoreCase(cliente.getDireccion())){
-            depDB.setDireccion(cliente.getDireccion());
-        }
-
-        return repoCliente.save(depDB);
-
     }
 }
 

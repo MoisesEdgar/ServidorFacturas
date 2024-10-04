@@ -1,7 +1,5 @@
 package com.ServidorFacturas.cliente;
 
-import com.ServidorFacturas.factura.Factura;
-import com.ServidorFacturas.factura.FacturaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,12 +23,7 @@ public class ClienteController {
                 .map(cliente -> toDTO(cliente))
                 .collect(Collectors.toList());
     }
-
-    @GetMapping("/{id}")
-    public ClienteDTO getByID(@PathVariable Long id){
-        Cliente entidad = repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el Cliente con el id " + id));
-        return toDTO(entidad);
-    }
+    
 
     @PostMapping
     public ClienteDTO save(@RequestBody ClienteDTO clienteDTO){
@@ -39,21 +32,6 @@ public class ClienteController {
         return toDTO(guardada);
     }
 
-    @PutMapping("/{id}")
-    public ClienteDTO updateCliente(@RequestBody ClienteDTO clienteDTO, @PathVariable Long id){
-        Cliente cliente = toEntity(clienteDTO);
-        Cliente modificada = serviceCliente.updateCleinte(cliente ,id);
-        return toDTO(modificada);
-    }
-
-  /*  @DeleteMapping("/{id}")
-    public String deleteClienteById(@PathVariable Long id){
-        repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el Cliente con el id " + id));
-        repoCliente.deleteById(id);
-        return "Se elinimo al cliente con id " + id;
-    }
-
-*/
 
     private ClienteDTO toDTO(Cliente cliente){
         ClienteDTO dto = new ClienteDTO();

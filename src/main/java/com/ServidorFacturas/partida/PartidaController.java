@@ -23,10 +23,6 @@ public class PartidaController {
     @Autowired
     private FacturaService serviceFactura;
 
-
-
-
-
     @PostMapping
     private PartidaDTO save(@RequestBody PartidaDTO partidaDTO){
         Partida partida = toEntity(partidaDTO);
@@ -45,9 +41,6 @@ public class PartidaController {
         serviceFactura.calcularTotales(idFactura);
         return "Se elinimo la partida con id " + id;
     }
-
-
-
 
     private PartidaDTO toDTO(Partida partida){
         PartidaDTO dto = new PartidaDTO();
@@ -74,5 +67,4 @@ public class PartidaController {
 
         return partida;
     }
-
 }

@@ -45,14 +45,12 @@ public class FacturaController {
         return toDTO(modificada);
     }
 
-
     @DeleteMapping("/{id}")
     public String deleteFacturaById(@PathVariable Long id){
         repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
         repoFactura.deleteById(id);
         return "Se elinimo la factura con id " + id;
     }
-
 
     private FacturaDTO toDTO(Factura factura){
        FacturaDTO dto = new FacturaDTO();
