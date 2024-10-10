@@ -24,7 +24,6 @@ public class ClienteController {
                 .collect(Collectors.toList());
     }
 
-
     @PostMapping
     public ClienteDTO save(@RequestBody ClienteDTO clienteDTO){
         Cliente cliente = toEntity(clienteDTO);

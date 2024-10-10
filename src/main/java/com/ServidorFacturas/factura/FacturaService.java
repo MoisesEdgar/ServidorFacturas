@@ -148,6 +148,9 @@ public class FacturaService {
 
     public Factura updateFactura(Factura factura, Long id) {
         Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
+        List<Partida> partidasActuales = depDB.getPartidas();
+
+        List<Partida> partidasActualizadas = new ArrayList<>();
 
         for (Partida partida : factura.getPartidas()) {
 
@@ -169,12 +172,34 @@ public class FacturaService {
                         throw new RuntimeException("El precio debe ser mayor o igual a 0.1");
                     }
 
+                    if(partida.getId() != null){
+                        partidasActualizadas.add(partida);
+                    }
+
             partida.setFactura(depDB);
             depDB.getPartidas().add(partida);
         }
 
+
+//        for(int i = 0; i < partidasActuales.size(); i++){
+//            boolean opc = false;
+//            Partida partidaActual = partidasActuales.get(i);
+//
+//            for(int j = 0; j < partidasActualizadas.size(); j++){
+//                Partida partidaActualizada = partidasActualizadas.get(j);
+//
+//                if(partidaActual.getId().equals(partidaActualizada.getId())){
+//                    opc = true;
+//                }
+//            }
+//            if(opc == false){
+//                repoPartida.deleteById(Long.valueOf(i));
+//            }
+//        }
+
         return repoFactura.save(depDB);
     }
+
 }
 
 
