@@ -22,6 +22,8 @@ public class Factura {
     @Temporal(TemporalType.DATE)
     private Integer clienteId;
 
+
+
     @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL)
     private List<Partida> partidas;
 

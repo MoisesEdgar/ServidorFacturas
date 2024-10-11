@@ -34,7 +34,7 @@ public class PartidaController {
 
     //ELIMINA
     @DeleteMapping("/{id}")
-    private String deletepartidaById(@PathVariable Long id){
+    public String deletepartidaById(@PathVariable Long id){
         repoPartida.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la partida con el id " + id));
         Long idFactura = servicePartida.getIdFactura(id);
         repoPartida.deleteById(id);
