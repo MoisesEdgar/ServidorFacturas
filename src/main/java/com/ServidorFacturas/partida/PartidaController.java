@@ -31,7 +31,7 @@ public class PartidaController {
         serviceFactura.calcularTotales(idFactura);
         return toDTO(guardada);
     }
-
+    
     //ELIMINA
     @DeleteMapping("/{id}")
     public String deletepartidaById(@PathVariable Long id){

@@ -22,9 +22,7 @@ public class Factura {
     @Temporal(TemporalType.DATE)
     private Integer clienteId;
 
-
-
-    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partida> partidas;
 
     public Integer getClienteId() {
