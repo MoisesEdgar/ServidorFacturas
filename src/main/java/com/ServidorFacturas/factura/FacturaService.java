@@ -143,245 +143,49 @@ public class FacturaService {
         repoFactura.save(factura);
     }
 
+
     public Factura updateFactura(Factura factura, Long id) {
         Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
         List<Partida> partidasActuales = depDB.getPartidas();
-        List<Partida> partidasActualizadas = new ArrayList<>();
-
-        Map<Long, Partida> mapaPartidasActuales = partidasActuales.stream()
-                .collect(Collectors.toMap(Partida::getId, partida -> partida));
+        List<Long> idsPartidas = new ArrayList<>();
 
         for (Partida partida : factura.getPartidas()) {
-            if (partida.getId() != null && mapaPartidasActuales.containsKey(partida.getId())) {
 
-                Partida partidaExistente = mapaPartidasActuales.get(partida.getId());
-                partidaExistente.setNombreArticulo(partida.getNombreArticulo());
-                partidaExistente.setCantidad(partida.getCantidad());
-                partidaExistente.setPrecio(partida.getPrecio());
-                partidaExistente.setFactura(depDB);
-                partidasActualizadas.add(partidaExistente);
+            if (Objects.nonNull(partida.getNombreArticulo())) {
+                partida.setNombreArticulo(partida.getNombreArticulo());
             } else {
+                throw new RuntimeException("No se especificó un nombre");
+            }
+
+            if (Objects.nonNull(partida.getCantidad()) && partida.getCantidad() > 0) {
+                partida.setCantidad(partida.getCantidad());
+            } else {
+                throw new RuntimeException("La cantidad debe ser mayor a 0");
+            }
+
+            if (Objects.nonNull(partida.getPrecio()) && partida.getPrecio() >= 0.1) {
+                partida.setPrecio(partida.getPrecio());
+            } else {
+                throw new RuntimeException("El precio debe ser mayor o igual a 0.1");
+            }
+
+            if(partida.getId() != null){
+                Partida partidaExistente = partidasActuales.stream().filter(partidaActual -> partidaActual.getId().equals(partida.getId())).findFirst().orElse(null);
+                    Partida actualizada = partidaExistente;
+                    actualizada.setNombreArticulo(partida.getNombreArticulo());
+                    actualizada.setCantidad(partida.getCantidad());
+                    actualizada.setPrecio(partida.getPrecio());
+                    idsPartidas.add(partida.getId());
+            } else{
                 partida.setFactura(depDB);
-                partidasActualizadas.add(partida);
+                depDB.getPartidas().add(partida);
             }
         }
 
+        List<Long> idsEliminar = partidasActuales.stream().filter(p -> p.getId() != null && !idsPartidas.contains(p.getId())).map(Partida::getId).collect(Collectors.toList());
+
+        partidasActuales.removeIf(p -> idsEliminar.contains(p.getId()));
+
         return repoFactura.save(depDB);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    public Factura updateFactura(Factura factura, Long id) {
-//        Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
-//       List<Partida> partidasActuales = depDB.getPartidas();
-//        List<Long> idsPartidas = new ArrayList<>();
-//        for (Partida partida : factura.getPartidas()) {
-//
-//                    if (Objects.nonNull(partida.getNombreArticulo())) {
-//                        partida.setNombreArticulo(partida.getNombreArticulo());
-//                    } else {
-//                        throw new RuntimeException("No se especifico un nombre");
-//                    }
-//
-//                    if (Objects.nonNull(partida.getCantidad()) && partida.getCantidad() > 0) {
-//                      partida.setCantidad(partida.getCantidad());
-//                    } else {
-//                        throw new RuntimeException("La cantidad debe ser mayor a 0");
-//                    }
-//
-//                    if (Objects.nonNull(partida.getPrecio()) && partida.getPrecio() >= 0.1) {
-//                        partida.setPrecio(partida.getPrecio());
-//                    } else {
-//                        throw new RuntimeException("El precio debe ser mayor o igual a 0.1");
-//                    }
-//
-//            partida.setFactura(depDB);
-//            depDB.getPartidas().add(partida);
-
-//            if(partida.getId() != null){
-//                idsPartidas.add(partida.getId());
-//            }
-
-//        }
-
-//        List<Long> idsEliminar = new ArrayList<>();
-//        for(int i = 0; i < partidasActuales.size(); i++){
-//            Boolean opc = false;
-//            Partida partidaActual = partidasActuales.get(i);
-//            for(int j = 0; j < idsPartidas.size(); j++){
-//                if(partidaActual.getId() != null && idsPartidas.get(j) != null){
-//                    if(partidaActual.getId().equals(idsPartidas.get(j))){
-//                        opc = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            if(opc == false){
-//                idsEliminar.add(partidaActual.getId());
-//            }
-//        }
-//
-//
-//        System.out.println(idsEliminar);
-//
-//
-//
-//
-//
-//        return repoFactura.save(depDB);
-//    }
-
-
-
-//    public Factura updateFactura(Factura factura, Long id) {
-//        Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
-//        List<Partida> partidasActuales = depDB.getPartidas();
-//        List<Long> idsPartidas = new ArrayList<>();
-//        List<Partida> partidasActualizadas = new ArrayList<>();
-//
-//        for (Partida partida : factura.getPartidas()) {
-//
-//            if (Objects.isNull(partida.getNombreArticulo())) {
-//                throw new RuntimeException("No se especifico un nombre");
-//            }
-//
-//            if (Objects.isNull(partida.getCantidad()) && partida.getCantidad() < 0) {
-//                throw new RuntimeException("La cantidad debe ser mayor a 0");
-//            }
-//
-//            if (Objects.isNull(partida.getPrecio()) && partida.getPrecio() < 0.1) {
-//                throw new RuntimeException("El precio debe ser mayor o igual a 0.1");
-//            }
-//
-//            // actualizar existente
-//            Partida partidaExistente = new Partida();
-//            partidaExistente.setId(partida.getId());
-//            partidaExistente.setNombreArticulo(partida.getNombreArticulo());
-//            partidaExistente.setCantidad(partida.getCantidad());
-//            partidaExistente.setPrecio(partida.getPrecio());
-//            partidaExistente.setFactura(depDB);
-//
-//            partidasActualizadas.add(partidaExistente);
-//
-//            if (partida.getId() != null) {
-//                idsPartidas.add(partida.getId());
-//            }
-//        }
-//
-//        List<Partida> partidasParaEliminar = new ArrayList<>();
-//        for(int i = 0; i < partidasActuales.size(); i++){
-//            Boolean opc = false;
-//            Partida partidaActual = partidasActuales.get(i);
-//            for(int j = 0; j < idsPartidas.size(); j++){
-//                if(partidaActual.getId() != null && idsPartidas.get(j) != null){
-//                    if(partidaActual.getId().equals(idsPartidas.get(j))){
-//                        opc = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            if(opc == false){
-//                partidasParaEliminar.add(partidaActual);
-//            }
-//        }
-//
-//        for(int i = 0; i < partidasParaEliminar.size(); i++){
-//            Partida eliminar = partidasParaEliminar.get(i);
-//            repoPartida.deleteById(eliminar.getId());
-//        }
-//
-//
-//
-//        for(int i = 0; i< partidasActualizadas.size(); i++){
-//            Partida partidass = partidasActualizadas.get(i);
-//            for(int j = 0; j < partidasActuales.size(); j++){
-//                Partida partidaActual = partidasActuales.get(i);
-//                if(partidass.getId().equals(partidaActual.getId())){
-//
-//                    Partida partida = new Partida();
-//                    partida.setId(partida.getId());
-//                    partida.setNombreArticulo(partida.getNombreArticulo());
-//                    partida.setCantidad(partida.getCantidad());
-//                    partida.setPrecio(partida.getPrecio());
-//                    partida.setFactura(depDB);
-//                    depDB.getPartidas().add(partida);
-//
-//                    break;
-//                }
-//
-//            }
-//
-//
-//
-//        }
-//
-//
-//        return repoFactura.save(depDB);
-//    }
-
-
-//    public Factura updateFactura(Factura factura, Long id) {
-//        Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
-//        List<Long> ids = new ArrayList<>();
-//        for (Partida partida : factura.getPartidas()) {
-//
-//                    if (Objects.nonNull(partida.getNombreArticulo())) {
-//                        partida.setNombreArticulo(partida.getNombreArticulo());
-//                    } else {
-//                        throw new RuntimeException("No se especifico un nombre");
-//                    }
-//
-//                    if (Objects.nonNull(partida.getCantidad()) && partida.getCantidad() > 0) {
-//                      partida.setCantidad(partida.getCantidad());
-//                    } else {
-//                        throw new RuntimeException("La cantidad debe ser mayor a 0");
-//                    }
-//
-//                    if (Objects.nonNull(partida.getPrecio()) && partida.getPrecio() >= 0.1) {
-//                        partida.setPrecio(partida.getPrecio());
-//                    } else {
-//                        throw new RuntimeException("El precio debe ser mayor o igual a 0.1");
-//                    }
-//
-//                    if(partida.getId() != null){
-//                        ids.add(partida.getId());
-//                    }
-//
-//            partida.setFactura(depDB);
-//            depDB.getPartidas().add(partida);
-//
-//        }
-//
-//        List<Partida> partidasActuales = depDB.getPartidas();
-//        for(int i = 0; i <= partidasActuales.size(); i++ ){
-//            boolean opc = false;
-//            Partida partidaActual = partidasActuales.get(i);
-//
-//            for(int j = 0; j <= ids.size(); j++){
-//                if(partidaActual.getId() != null) {
-//                    if (ids.get(j).equals(partidaActual.getId())) {
-//                        opc = true;
-//                        break;
-//                    }
-//                }
-//                if(opc == false){
-//                    System.out.println("Eliminar id: " + ids.get(j));
-//                }
-//            }
-//        }
-//        return repoFactura.save(depDB);
-//    }
-
 }
