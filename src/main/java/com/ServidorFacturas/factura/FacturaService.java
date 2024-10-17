@@ -170,7 +170,10 @@ public class FacturaService {
             }
 
             if(partida.getId() != null){
-                Partida partidaExistente = partidasActuales.stream().filter(partidaActual -> partidaActual.getId().equals(partida.getId())).findFirst().orElse(null);
+                Partida partidaExistente = partidasActuales.stream()
+                        .filter(partidaActual -> partidaActual.getId().equals(partida.getId()))
+                        .findFirst().orElse(null);
+                
                     Partida actualizada = partidaExistente;
                     actualizada.setNombreArticulo(partida.getNombreArticulo());
                     actualizada.setCantidad(partida.getCantidad());
@@ -182,9 +185,12 @@ public class FacturaService {
             }
         }
 
-        List<Long> idsEliminar = partidasActuales.stream().filter(p -> p.getId() != null && !idsPartidas.contains(p.getId())).map(Partida::getId).collect(Collectors.toList());
+        List<Long> idsEliminar = partidasActuales.stream()
+                .filter(partidaActual -> partidaActual.getId() != null && !idsPartidas.contains(partidaActual.getId()))
+                .map(Partida::getId)
+                .collect(Collectors.toList());
 
-        partidasActuales.removeIf(p -> idsEliminar.contains(p.getId()));
+        partidasActuales.removeIf(partidaActual -> idsEliminar.contains(partidaActual.getId()));
 
         return repoFactura.save(depDB);
     }
