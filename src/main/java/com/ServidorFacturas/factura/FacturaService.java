@@ -2,6 +2,7 @@ package com.ServidorFacturas.factura;
 import com.ServidorFacturas.cliente.ClienteRepository;
 import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +14,12 @@ public class FacturaService {
 
     @Autowired
     private FacturaRepository repoFactura;
-    @Autowired
-    private PartidaRepository repoPartida;
+
     @Autowired
     private ClienteRepository repoCliente;
+
+    @Autowired
+    private PartidaRepository repoPartida;
 
     //AGREGA
     public Factura guardar(Factura factura){
@@ -146,52 +149,52 @@ public class FacturaService {
 
     public Factura updateFactura(Factura factura, Long id) {
         Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
-        List<Partida> partidasActuales = depDB.getPartidas();
+        List<Partida> partidasActuales = new ArrayList<>(depDB.getPartidas());
         List<Long> idsPartidas = new ArrayList<>();
+
 
         for (Partida partida : factura.getPartidas()) {
 
-            if (Objects.nonNull(partida.getNombreArticulo())) {
-                partida.setNombreArticulo(partida.getNombreArticulo());
-            } else {
+
+            if (Objects.isNull(partida.getNombreArticulo())) {
                 throw new RuntimeException("No se especificó un nombre");
             }
-
-            if (Objects.nonNull(partida.getCantidad()) && partida.getCantidad() > 0) {
-                partida.setCantidad(partida.getCantidad());
-            } else {
+            if (Objects.isNull(partida.getCantidad()) || partida.getCantidad() <= 0) {
                 throw new RuntimeException("La cantidad debe ser mayor a 0");
             }
-
-            if (Objects.nonNull(partida.getPrecio()) && partida.getPrecio() >= 0.1) {
-                partida.setPrecio(partida.getPrecio());
-            } else {
+            if (Objects.isNull(partida.getPrecio()) || partida.getPrecio() < 0.1) {
                 throw new RuntimeException("El precio debe ser mayor o igual a 0.1");
             }
 
-            if(partida.getId() != null){
+            if (partida.getId() != null) {
                 Partida partidaExistente = partidasActuales.stream()
-                        .filter(partidaActual -> partidaActual.getId().equals(partida.getId()))
+                        .filter(p -> p.getId().equals(partida.getId()))
                         .findFirst().orElse(null);
-                
-                    Partida actualizada = partidaExistente;
-                    actualizada.setNombreArticulo(partida.getNombreArticulo());
-                    actualizada.setCantidad(partida.getCantidad());
-                    actualizada.setPrecio(partida.getPrecio());
+
+                if (partidaExistente != null) {
+                    partidaExistente.setNombreArticulo(partida.getNombreArticulo());
+                    partidaExistente.setCantidad(partida.getCantidad());
+                    partidaExistente.setPrecio(partida.getPrecio());
                     idsPartidas.add(partida.getId());
-            } else{
+                }
+            } else {
                 partida.setFactura(depDB);
-                depDB.getPartidas().add(partida);
+                Partida nuevaPartida = repoPartida.save(partida);
+                depDB.getPartidas().add(nuevaPartida);
             }
         }
 
+
         List<Long> idsEliminar = partidasActuales.stream()
-                .filter(partidaActual -> partidaActual.getId() != null && !idsPartidas.contains(partidaActual.getId()))
+                .filter(partidaActual -> !idsPartidas.contains(partidaActual.getId()))
                 .map(Partida::getId)
                 .collect(Collectors.toList());
 
-        partidasActuales.removeIf(partidaActual -> idsEliminar.contains(partidaActual.getId()));
+
+        depDB.getPartidas().removeIf(partidaActual -> idsEliminar.contains(partidaActual.getId()));
+
 
         return repoFactura.save(depDB);
     }
+
 }
