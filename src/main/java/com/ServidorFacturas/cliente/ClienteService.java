@@ -2,10 +2,7 @@ package com.ServidorFacturas.cliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
-import java.util.Objects;
-
 
 @Service
 public class ClienteService {
@@ -14,13 +11,17 @@ public class ClienteService {
     ClienteRepository repoCliente;
 
     public Cliente guardar(Cliente cliente){
-
-        if(cliente.getCodigo() == null || cliente.getCodigo().isEmpty()){
-            throw new RuntimeException("No se especifico el codigo del cliente");
-        }
+        List<Cliente> clientes = repoCliente.findAll();
 
         if(cliente.getNombre() == null || cliente.getNombre().isEmpty()){
             throw new RuntimeException("No se especifico el nombre del cliente");
+        }
+
+        boolean existenciaCliente = clientes.stream().
+                anyMatch(c-> c.getNombre().equalsIgnoreCase(cliente.getNombre()));
+
+        if (existenciaCliente) {
+            throw new RuntimeException("El nombre del cliente ya esta registrado");
         }
 
         if(cliente.getTelefono() == null || cliente.getTelefono().isEmpty()){
@@ -31,53 +32,40 @@ public class ClienteService {
             throw new RuntimeException("No se especifico la direccion del cliente");
         }
 
-        validarCodigoCliente(cliente.getCodigo());
-
+        String codigo = CrearCodigo();
+        cliente.setCodigo(codigo);
 
         return repoCliente.save(cliente);
     }
 
-    public void validarCodigoCliente(String codigo){
+    public String  CrearCodigo(){
+        List<Cliente> clientes = repoCliente.findAll();
+        String codigoAnterior = "";
+        String codigo = "";
 
-        String codigoFinal = "";
-        if (codigo.matches("^C-\\d\\d\\d")) {
-            List<Cliente> clientes = repoCliente.findAll();
-
-            for (Cliente cliente : clientes){
-                codigoFinal = cliente.getCodigo();
-            }
-
-            if(codigoFinal.isEmpty()){
-                if(codigo.equalsIgnoreCase("C-001")){
-                }else{
-                    throw new RuntimeException("El formato del codigo no es valido. La nuemracion debe ser: C-001");
-                }
-            }else{
-                Integer intCodigo = getNumeracion(codigo);
-                Integer intCodigoFinal = getNumeracion(codigoFinal);
-
-                if(intCodigo != (intCodigoFinal + 1)){
-                    String ceros = "";
-
-                    for (int i = String.valueOf(intCodigoFinal).length(); i < 3;) {
-                        i++;
-                        ceros = ceros + "0";
-                    }
-
-                    throw new RuntimeException("El formato del codigo no es valido. La nuemracion debe ser C-" + ceros + (intCodigoFinal + 1));
-                }
-            }
+        if(clientes.isEmpty()){
+            codigo = "C-001";
         }else{
-            throw new RuntimeException("El formato del codigo no es valido debe ser: C-000");
+            Integer ultimo = clientes.size();
+            Cliente cliente = clientes.get(ultimo-1);
+
+            codigoAnterior = cliente.getCodigo();
+
+            String[] salto = codigoAnterior.split("-");
+
+            Integer cont = Integer.parseInt(salto[1]);
+            String ceros = "";
+
+            for (int i = String.valueOf(cont).length(); i < 3;) {
+                i++;
+                ceros = ceros + "0";
+            }
+
+            codigo = "C-" + ceros + (Integer.parseInt(salto[1]) + 1);
         }
-
-
+        return codigo;
     }
 
-    public Integer getNumeracion(String codigo){
-        String[] salto = codigo.split("-");
-        return Integer.parseInt(salto[1]);
-    }
 }
 
 

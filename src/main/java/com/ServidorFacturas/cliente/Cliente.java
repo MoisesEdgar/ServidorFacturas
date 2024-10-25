@@ -1,10 +1,6 @@
 package com.ServidorFacturas.cliente;
 
-import com.ServidorFacturas.factura.Factura;
 import jakarta.persistence.*;
-
-import java.util.List;
-
 
 @Entity
 public class Cliente {

@@ -155,7 +155,6 @@ public class FacturaService {
 
         for (Partida partida : factura.getPartidas()) {
 
-
             if (Objects.isNull(partida.getNombreArticulo())) {
                 throw new RuntimeException("No se especificó un nombre");
             }
