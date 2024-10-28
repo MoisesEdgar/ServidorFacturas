@@ -15,13 +15,21 @@ public class ClienteController {
 
     @Autowired
     private ClienteService serviceCliente;
+    
+    @GetMapping
+    public List<ClienteDTO> getByNombre(@RequestParam(required = false) String nombre){
+        List<Cliente> clientes = repoCliente.findByNombre(nombre);
+        return clientes.stream().
+                map(cliente -> toDTO(cliente)).
+                collect(Collectors.toList());
+    }
 
     @GetMapping
     public List<ClienteDTO> getAll(){
         List<Cliente> clientes = repoCliente.findAll();
-        return clientes.stream()
-                .map(cliente -> toDTO(cliente))
-                .collect(Collectors.toList());
+        return clientes.stream().
+                map(cliente -> toDTO(cliente)).
+                collect(Collectors.toList());
     }
 
     @PostMapping
