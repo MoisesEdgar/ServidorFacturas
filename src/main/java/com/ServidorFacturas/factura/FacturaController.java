@@ -26,6 +26,19 @@ public class FacturaController {
         return facturas.stream().map(factura -> toDTO(factura)).collect(Collectors.toList());
     }
 
+    @GetMapping("/ultima")
+    public FacturaDTO getUltimo(){
+        Factura facturanull = new Factura();
+        Factura facturas = repoFactura.findByOrderBYidDesc().orElse(facturanull); 
+        return toDTO(facturas);
+    }
+
+    @GetMapping("/folio")
+    public FacturaDTO getByFolio(@RequestParam(required = false) String folio){
+        Factura factura = repoFactura.findByFolio(folio);
+        return toDTO(factura);
+    }
+
     @GetMapping("/{id}")
     public FacturaDTO getByID(@PathVariable Long id){
         Factura entidad = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));

@@ -15,22 +15,33 @@ public class ClienteController {
 
     @Autowired
     private ClienteService serviceCliente;
-    
-    @GetMapping
-    public List<ClienteDTO> getByNombre(@RequestParam(required = false) String nombre){
-        List<Cliente> clientes = repoCliente.findByNombre(nombre);
-        return clientes.stream().
-                map(cliente -> toDTO(cliente)).
-                collect(Collectors.toList());
+
+    @GetMapping("/{id}")
+    public ClienteDTO getById(@PathVariable Long id){
+        Cliente cliente = repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro ningun cliente con el id : " + id));
+        return toDTO(cliente);
     }
 
-    @GetMapping
-    public List<ClienteDTO> getAll(){
-        List<Cliente> clientes = repoCliente.findAll();
-        return clientes.stream().
-                map(cliente -> toDTO(cliente)).
-                collect(Collectors.toList());
+
+    @GetMapping("/nombre")
+    public ClienteDTO getByNombre(@RequestParam(required = false) String nombre){
+        Cliente cliente = repoCliente.findByNombre(nombre);
+        return toDTO(cliente);
     }
+
+    @GetMapping("/codigo")
+    public ClienteDTO getByCodigo(@RequestParam(required = false)String codigo){
+        Cliente cliente = repoCliente.findByCodigo(codigo);
+        return toDTO(cliente);
+    }
+
+//    @GetMapping
+//    public List<ClienteDTO> getAll(){
+//        List<Cliente> clientes = repoCliente.findAll();
+//        return clientes.stream().
+//                map(cliente -> toDTO(cliente)).
+//                collect(Collectors.toList());
+//    }
 
     @PostMapping
     public ClienteDTO save(@RequestBody ClienteDTO clienteDTO){
