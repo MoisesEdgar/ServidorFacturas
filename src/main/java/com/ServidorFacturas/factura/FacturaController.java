@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/facturas")
@@ -17,11 +19,11 @@ public class FacturaController {
     @Autowired
     private FacturaService serviceFactura;
 
-//    @GetMapping
-//    public List<FacturaDTO> getAll(){
-//        List<Factura> facturas = repoFactura.findAll();
-//        return facturas.stream().map(factura -> toDTO(factura)).collect(Collectors.toList());
-//    }
+    @GetMapping
+    public List<FacturaDTO> getAll(){
+        List<Factura> facturas = repoFactura.findAll();
+        return facturas.stream().map(factura -> toDTO(factura)).collect(Collectors.toList());
+    }
 
     @GetMapping("/ultima")
     public ResponseEntity<FacturaDTO> getUltimo(){

@@ -4,6 +4,7 @@ import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -86,10 +87,10 @@ public class FacturaService {
     public void validarFolio(String folio){
         String folioFinal = "";
         if (folio.matches("^F-\\d\\d\\d")) {
-            List<Factura> facturas = repoFactura.findAll();
+            Factura factura = repoFactura.findByOrderBYidDesc().orElse(null);
 
-            for (Factura factura : facturas){
-               folioFinal = factura.getFolio();
+            if(factura != null){
+                folioFinal = factura.getFolio();
             }
 
             if(folioFinal.isEmpty()){
