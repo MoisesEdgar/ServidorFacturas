@@ -3,13 +3,10 @@ package com.ServidorFacturas.factura;
 import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-
 
 @RestController
 @RequestMapping("/facturas")
@@ -20,23 +17,28 @@ public class FacturaController {
     @Autowired
     private FacturaService serviceFactura;
 
-    @GetMapping
-    public List<FacturaDTO> getAll(){
-        List<Factura> facturas = repoFactura.findAll();
-        return facturas.stream().map(factura -> toDTO(factura)).collect(Collectors.toList());
-    }
+//    @GetMapping
+//    public List<FacturaDTO> getAll(){
+//        List<Factura> facturas = repoFactura.findAll();
+//        return facturas.stream().map(factura -> toDTO(factura)).collect(Collectors.toList());
+//    }
 
     @GetMapping("/ultima")
-    public FacturaDTO getUltimo(){
-        Factura facturanull = new Factura();
-        Factura facturas = repoFactura.findByOrderBYidDesc().orElse(facturanull); 
-        return toDTO(facturas);
+    public ResponseEntity<FacturaDTO> getUltimo(){
+        Factura factura = repoFactura.findByOrderBYidDesc().orElse(null);
+        if(factura == null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(toDTO(factura));
     }
 
     @GetMapping("/folio")
-    public FacturaDTO getByFolio(@RequestParam(required = false) String folio){
-        Factura factura = repoFactura.findByFolio(folio);
-        return toDTO(factura);
+    public ResponseEntity<FacturaDTO> getByFolio(@RequestParam(required = false) String folio){
+        Factura factura = repoFactura.findByFolio(folio).orElse(null);
+        if(factura == null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(toDTO(factura));
     }
 
     @GetMapping("/{id}")

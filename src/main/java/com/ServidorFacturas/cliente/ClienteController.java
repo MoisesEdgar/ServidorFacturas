@@ -1,10 +1,8 @@
 package com.ServidorFacturas.cliente;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/clientes")
@@ -24,15 +22,22 @@ public class ClienteController {
 
 
     @GetMapping("/nombre")
-    public ClienteDTO getByNombre(@RequestParam(required = false) String nombre){
-        Cliente cliente = repoCliente.findByNombre(nombre);
-        return toDTO(cliente);
+    public ResponseEntity<ClienteDTO> getByNombre(@RequestParam(required = false) String nombre){
+        Cliente cliente = repoCliente.findByNombre(nombre).orElse(null);
+        if (cliente == null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(toDTO(cliente));
+
     }
 
     @GetMapping("/codigo")
-    public ClienteDTO getByCodigo(@RequestParam(required = false)String codigo){
-        Cliente cliente = repoCliente.findByCodigo(codigo);
-        return toDTO(cliente);
+    public ResponseEntity<ClienteDTO> getByCodigo(@RequestParam(required = false)String codigo){
+        Cliente cliente = repoCliente.findByCodigo(codigo).orElse(null);
+        if (cliente == null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(toDTO(cliente));
     }
 
 //    @GetMapping

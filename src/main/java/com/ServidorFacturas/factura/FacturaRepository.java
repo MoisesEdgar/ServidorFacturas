@@ -8,7 +8,7 @@ import java.util.Optional;
 
 
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
-    Factura findByFolio(@Param("folio") String folio);
+    Optional<Factura> findByFolio(@Param("folio") String folio);
 
     @Query("SELECT f FROM Factura f ORDER BY f.id DESC LIMIT 1")
     Optional<Factura> findByOrderBYidDesc();
