@@ -43,6 +43,8 @@ public class FacturaController {
         return ResponseEntity.ok(toDTO(factura));
     }
 
+
+
     @GetMapping("/{id}")
     public FacturaDTO getByID(@PathVariable Long id){
         Factura entidad = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
