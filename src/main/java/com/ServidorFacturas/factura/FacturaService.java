@@ -83,14 +83,9 @@ public class FacturaService {
     }
 
     public void validarFolio(String folio){
-        String folioAnterior = "";
         if (folio.matches("^F-\\d\\d\\d")) {
 
-            Factura factura = repoFactura.findByOrderBYidDesc().orElse(null);
-
-            if(factura != null){
-                folioAnterior = factura.getFolio();
-            }
+            String folioAnterior = repoFactura.findByOrderBYidDesc().orElse(null);
 
             if(folioAnterior.isEmpty()){
                 if(folio.equalsIgnoreCase("F-001")){
@@ -98,8 +93,6 @@ public class FacturaService {
                     throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser: F-001");
                 }
             }else{
-
-
                 Integer nuevaNumeracion = getNumeracion(folio);
                 Integer anteriorNumeracion = getNumeracion(folioAnterior);
 
@@ -148,10 +141,6 @@ public class FacturaService {
         repoFactura.save(factura);
     }
 
-    public String folioAnterior(){
-        Factura factura = repoFactura.findByOrderBYidDesc().orElse(null);
-        return factura.getFolio();
-    }
 
 
 
