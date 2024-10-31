@@ -25,17 +25,17 @@ public class FacturaController {
         return facturas.stream().map(factura -> toDTO(factura)).collect(Collectors.toList());
     }
 
-    @GetMapping("/ultima")
-    public ResponseEntity<FacturaDTO> getUltimo(){
-        Factura factura = repoFactura.findByOrderBYidDesc().orElse(null);
-        if(factura == null){
+    @GetMapping("/anterior")
+    public ResponseEntity<String> getUltimo(){
+        String  folioAnterior = serviceFactura.folioAnterior();
+        if(folioAnterior == null){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(toDTO(factura));
+        return ResponseEntity.ok(folioAnterior);
     }
 
     @GetMapping("/folio")
-    public ResponseEntity<FacturaDTO> getByFolio(@RequestParam(required = false) String folio){
+    public ResponseEntity<FacturaDTO> getByFolio(@RequestParam String folio){
         Factura factura = repoFactura.findByFolio(folio).orElse(null);
         if(factura == null){
             return ResponseEntity.notFound().build();

@@ -2,9 +2,7 @@ package com.ServidorFacturas.factura;
 import com.ServidorFacturas.cliente.ClienteRepository;
 import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -39,7 +37,7 @@ public class FacturaService {
         if(factura.getClienteId() == null){
             throw new RuntimeException("No se especifico el id del cliente");
         }else{
-           Long id = Integer.toUnsignedLong(factura.getClienteId());
+           Long id = factura.getClienteId();
            repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el Cliente con el id " + id));
         }
 
@@ -85,32 +83,35 @@ public class FacturaService {
     }
 
     public void validarFolio(String folio){
-        String folioFinal = "";
+        String folioAnterior = "";
         if (folio.matches("^F-\\d\\d\\d")) {
+
             Factura factura = repoFactura.findByOrderBYidDesc().orElse(null);
 
             if(factura != null){
-                folioFinal = factura.getFolio();
+                folioAnterior = factura.getFolio();
             }
 
-            if(folioFinal.isEmpty()){
+            if(folioAnterior.isEmpty()){
                 if(folio.equalsIgnoreCase("F-001")){
                 }else{
                     throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser: F-001");
                 }
             }else{
-                Integer intFolio = getNumeracion(folio);
-                Integer intFolioFinal = getNumeracion(folioFinal);
 
-                if(intFolio != (intFolioFinal + 1)){
+
+                Integer nuevaNumeracion = getNumeracion(folio);
+                Integer anteriorNumeracion = getNumeracion(folioAnterior);
+
+                if(nuevaNumeracion  != (anteriorNumeracion  + 1)){
                     String ceros = "";
 
-                        for (int i = String.valueOf(intFolioFinal).length(); i < 3;) {
+                        for (int i = String.valueOf(anteriorNumeracion ).length(); i < 3;) {
                             i++;
                             ceros = ceros + "0";
                         }
 
-                    throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser F-" + ceros + (intFolioFinal + 1));
+                    throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser F-" + ceros + (anteriorNumeracion  + 1));
                 }
             }
         }else{
@@ -146,6 +147,13 @@ public class FacturaService {
         }
         repoFactura.save(factura);
     }
+
+    public String folioAnterior(){
+        Factura factura = repoFactura.findByOrderBYidDesc().orElse(null);
+        return factura.getFolio();
+    }
+
+
 
 
     public Factura updateFactura(Factura factura, Long id) {

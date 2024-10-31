@@ -20,16 +20,16 @@ public class Factura {
     private Double total;
     @Column(name = "cliente-id")
     @Temporal(TemporalType.DATE)
-    private Integer clienteId;
+    private Long clienteId;
 
     @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partida> partidas;
 
-    public Integer getClienteId() {
+    public Long getClienteId() {
         return clienteId;
     }
 
-    public void setClienteId(Integer clienteId) {
+    public void setClienteId(Long clienteId) {
         this.clienteId = clienteId;
     }
 

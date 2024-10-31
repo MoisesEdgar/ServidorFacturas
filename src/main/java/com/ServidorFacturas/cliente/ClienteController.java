@@ -22,7 +22,7 @@ public class ClienteController {
 
 
     @GetMapping("/nombre")
-    public ResponseEntity<ClienteDTO> getByNombre(@RequestParam(required = false) String nombre){
+    public ResponseEntity<ClienteDTO> getByNombre(@RequestParam String nombre){
         Cliente cliente = repoCliente.findByNombre(nombre).orElse(null);
         if (cliente == null){
             return ResponseEntity.notFound().build();
@@ -32,7 +32,7 @@ public class ClienteController {
     }
 
     @GetMapping("/codigo")
-    public ResponseEntity<ClienteDTO> getByCodigo(@RequestParam(required = false)String codigo){
+    public ResponseEntity<ClienteDTO> getByCodigo(@RequestParam String codigo){
         Cliente cliente = repoCliente.findByCodigo(codigo).orElse(null);
         if (cliente == null){
             return ResponseEntity.notFound().build();

@@ -11,7 +11,7 @@ public class FacturaDTO {
     public Date fecha_expedicion;
     public Double subtotal;
     public Double total;
-    public Integer cliente_id;
+    public Long cliente_id;
     public List<PartidaDTO> partidas;
 
 }
