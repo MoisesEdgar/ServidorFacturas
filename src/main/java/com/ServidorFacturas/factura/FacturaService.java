@@ -25,8 +25,6 @@ public class FacturaService {
 
     //AGREGA
     public Factura guardar(Factura factura){
-        Double subtotal = 0.0;
-        Double total = 0.0;
 
         //FOLIO
         if(factura.getFolio() == null || factura.getFolio().isEmpty()){
@@ -54,7 +52,6 @@ public class FacturaService {
 
             //CANTIDAD
             Integer cantidad = partida.getCantidad();
-
             if(cantidad <= 0){
                 throw new RuntimeException("La cantidad debe ser mayor a 0");
             }
@@ -65,22 +62,16 @@ public class FacturaService {
                 throw new RuntimeException("El precio debe ser mayor a 0.1");
             }
 
-            subtotal += cantidad * precio;
+
             //ID_FACTURA
             partida.setFactura(factura);
         }
-
-        total = subtotal + subtotal * 0.16;
-
-        //SUBTOTAL
-        factura.setSubtotal(Math.round(subtotal * 100)/100d);
-
-        //TOTAL
-        factura.setTotal(Math.round(total * 100)/100d);
-
         validarFolio(factura.getFolio());
 
+        Map<String, Object> totales = calcularTotales(factura);
 
+        factura.setSubtotal((Double) totales.get("subtotal"));
+        factura.setTotal((Double) totales.get("total"));
 
         return repoFactura.save(factura);
     }
@@ -125,7 +116,7 @@ public class FacturaService {
         return Integer.parseInt(salto[1]);
     }
 
-    public void calcularTotales(Factura factura) {
+    public Map calcularTotales(Factura factura) {
         double subtotal = 0.0;
         double total = 0.0;
 
@@ -145,7 +136,11 @@ public class FacturaService {
             factura.setSubtotal(Math.round(subtotal * 100) / 100.0);
             factura.setTotal(Math.round(total * 100) / 100.0);
         }
-        repoFactura.save(factura);
+        Map<String, Object> totales = new HashMap<>();
+        totales.put("subtotal", subtotal);
+        totales.put("total", total);
+
+        return totales;
     }
 
     public Factura updateFactura(Factura factura, Long id) {
@@ -193,7 +188,10 @@ public class FacturaService {
 
         depDB.getPartidas().removeIf(partidaActual -> idsEliminar.contains(partidaActual.getId()));
 
-        calcularTotales(depDB);
+        Map<String, Object> totales = calcularTotales(depDB);
+
+        depDB.setSubtotal((Double) totales.get("subtotal"));
+        depDB.setTotal((Double) totales.get("total"));
         return repoFactura.save(depDB);
     }
 
