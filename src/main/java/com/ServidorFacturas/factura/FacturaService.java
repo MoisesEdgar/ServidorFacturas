@@ -87,9 +87,8 @@ public class FacturaService {
 
             String folioAnterior = repoFactura.findByOrderBYidDesc().orElse(null);
 
-            if(folioAnterior.isEmpty()){
-                if(folio.equalsIgnoreCase("F-001")){
-                }else{
+            if(folioAnterior == null){
+                if(!folio.equalsIgnoreCase("F-001")){
                     throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser: F-001");
                 }
             }else{

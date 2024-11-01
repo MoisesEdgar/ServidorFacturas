@@ -27,11 +27,11 @@ public class FacturaController {
 
     @GetMapping("/anterior")
     public ResponseEntity<String> getUltimo(){
-        String factura = repoFactura.findByOrderBYidDesc().orElse(null);
-        if(factura == null){
+        String folio = repoFactura.findByOrderBYidDesc().orElse(null);
+        if(folio == null){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(factura);
+        return ResponseEntity.ok(folio);
     }
 
     @GetMapping("/folio")
