@@ -3,7 +3,10 @@ import com.ServidorFacturas.cliente.ClienteRepository;
 import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -83,10 +86,16 @@ public class FacturaService {
     }
 
     public void validarFolio(String folio){
+        String folioAnterior = "";
+
+
+        try{
+           folioAnterior = repoFactura.findUltimoFolio();
+        }catch(DataAccessException ex){
+            folioAnterior = null;
+        }
+
         if (folio.matches("^F-\\d\\d\\d")) {
-
-            String folioAnterior = repoFactura.findUltimoFolio().orElse(null);
-
             if(folioAnterior == null){
                 if(!folio.equalsIgnoreCase("F-001")){
                     throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser: F-001");
@@ -98,10 +107,10 @@ public class FacturaService {
                 if(nuevaNumeracion  != (anteriorNumeracion  + 1)){
                     String ceros = "";
 
-                        for (int i = String.valueOf(anteriorNumeracion ).length(); i < 3;) {
-                            i++;
-                            ceros = ceros + "0";
-                        }
+                    for (int i = String.valueOf(anteriorNumeracion ).length(); i < 3;) {
+                        i++;
+                        ceros = ceros + "0";
+                    }
 
                     throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser F-" + ceros + (anteriorNumeracion  + 1));
                 }
@@ -139,11 +148,7 @@ public class FacturaService {
         }
         repoFactura.save(factura);
     }
-
-
-
-
-
+    
     public Factura updateFactura(Factura factura, Long id) {
         Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
         List<Partida> partidasActuales = new ArrayList<>(depDB.getPartidas());
