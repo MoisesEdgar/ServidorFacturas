@@ -85,7 +85,7 @@ public class FacturaService {
     public void validarFolio(String folio){
         if (folio.matches("^F-\\d\\d\\d")) {
 
-            String folioAnterior = repoFactura.findByOrderBYidDesc().orElse(null);
+            String folioAnterior = repoFactura.findUltimoFolio().orElse(null);
 
             if(folioAnterior == null){
                 if(!folio.equalsIgnoreCase("F-001")){

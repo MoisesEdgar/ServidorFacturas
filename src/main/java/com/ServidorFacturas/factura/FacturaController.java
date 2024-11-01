@@ -27,7 +27,7 @@ public class FacturaController {
 
     @GetMapping("/anterior")
     public ResponseEntity<String> getUltimo(){
-        String folio = repoFactura.findByOrderBYidDesc().orElse(null);
+        String folio = repoFactura.findUltimoFolio().orElse(null);
         if(folio == null){
             return ResponseEntity.notFound().build();
         }
