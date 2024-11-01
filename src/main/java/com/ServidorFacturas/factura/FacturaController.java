@@ -67,7 +67,6 @@ public class FacturaController {
     public FacturaDTO updateFactura(@RequestBody FacturaDTO facturaDTO, @PathVariable Long id){
         Factura factura = toEntity(facturaDTO);
         Factura modificada = serviceFactura.updateFactura(factura ,id);
-        serviceFactura.calcularTotales(id);
         return toDTO(modificada);
     }
 

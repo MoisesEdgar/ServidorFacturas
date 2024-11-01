@@ -125,8 +125,7 @@ public class FacturaService {
         return Integer.parseInt(salto[1]);
     }
 
-    public void calcularTotales(Long id) {
-        Factura factura = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
+    public void calcularTotales(Factura factura) {
         double subtotal = 0.0;
         double total = 0.0;
 
@@ -148,7 +147,7 @@ public class FacturaService {
         }
         repoFactura.save(factura);
     }
-    
+
     public Factura updateFactura(Factura factura, Long id) {
         Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
         List<Partida> partidasActuales = new ArrayList<>(depDB.getPartidas());
@@ -194,7 +193,7 @@ public class FacturaService {
 
         depDB.getPartidas().removeIf(partidaActual -> idsEliminar.contains(partidaActual.getId()));
 
-
+        calcularTotales(depDB);
         return repoFactura.save(depDB);
     }
 
