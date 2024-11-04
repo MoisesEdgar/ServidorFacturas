@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 @Service
 public class ClienteService {
 
@@ -11,16 +12,13 @@ public class ClienteService {
     ClienteRepository repoCliente;
 
     public Cliente guardar(Cliente cliente){
-        List<Cliente> clientes = repoCliente.findAll();
 
         if(cliente.getNombre() == null || cliente.getNombre().isEmpty()){
             throw new RuntimeException("No se especifico el nombre del cliente");
         }
 
-        boolean existenciaCliente = clientes.stream().
-                anyMatch(c-> c.getNombre().equalsIgnoreCase(cliente.getNombre()));
-
-        if (existenciaCliente) {
+        Cliente existenciaCliente = repoCliente.findByNombre(cliente.getNombre()).orElse(null);
+        if (existenciaCliente != null){
             throw new RuntimeException("El nombre del cliente ya esta registrado");
         }
 
@@ -32,14 +30,42 @@ public class ClienteService {
             throw new RuntimeException("No se especifico la direccion del cliente");
         }
 
-        String codigo = CrearCodigo();
+        String codigo = crearCodigo(cliente.getNombre());
         cliente.setCodigo(codigo);
 
         return repoCliente.save(cliente);
     }
 
-    public String  CrearCodigo(){
+    public String crearCodigo(String nombre){
+//
+//        Cliente clienteAnterior = repoCliente.findByNombre(nombre).orElse(null);
+//
+//        String codigoAnterior = "";
+//        String codigo = "";
+//
+//        Integer tabla = repoCliente.tamanoTabla();
+//
+//        if(tabla == 0){
+//            codigo = "C-001";
+//        }else{
+//            codigoAnterior = clienteAnterior.getCodigo();
+//
+//            String[] salto = codigoAnterior.split("-");
+//
+//            Integer cont = Integer.parseInt(salto[1]);
+//            String ceros = "";
+//
+//            for (int i = String.valueOf(cont).length(); i < 3;) {
+//                i++;
+//                ceros = ceros + "0";
+//            }
+//
+//            codigo = "C-" + ceros + (Integer.parseInt(salto[1]) + 1);
+//        }
+//        return codigo;
+
         List<Cliente> clientes = repoCliente.findAll();
+
         String codigoAnterior = "";
         String codigo = "";
 
@@ -64,6 +90,7 @@ public class ClienteService {
             codigo = "C-" + ceros + (Integer.parseInt(salto[1]) + 1);
         }
         return codigo;
+
     }
 
 }

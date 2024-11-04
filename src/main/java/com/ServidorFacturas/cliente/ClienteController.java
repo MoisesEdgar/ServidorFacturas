@@ -55,7 +55,6 @@ public class ClienteController {
         return toDTO(guardada);
     }
 
-
     private ClienteDTO toDTO(Cliente cliente){
         ClienteDTO dto = new ClienteDTO();
         dto.id = cliente.getId();

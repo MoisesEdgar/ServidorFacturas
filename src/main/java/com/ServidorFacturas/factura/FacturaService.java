@@ -1,12 +1,11 @@
 package com.ServidorFacturas.factura;
+
 import com.ServidorFacturas.cliente.ClienteRepository;
-import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ServidorFacturas.partida.Partida;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,18 +22,14 @@ public class FacturaService {
     @Autowired
     private PartidaRepository repoPartida;
 
-    //AGREGA
     public Factura guardar(Factura factura){
 
-        //FOLIO
         if(factura.getFolio() == null || factura.getFolio().isEmpty()){
             throw new RuntimeException("No se especifico el folio de la factura");
         }
 
-        //FECHA
         factura.setFechaExpedicion(new Date());
 
-        //ID_CLIENTE
         if(factura.getClienteId() == null){
             throw new RuntimeException("No se especifico el id del cliente");
         }else{
@@ -42,31 +37,26 @@ public class FacturaService {
            repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el Cliente con el id " + id));
         }
 
-        //PARTIDAS
         for (Partida partida : factura.getPartidas()) {
 
-            //NOMBRE_ARTICULO
             if(partida.getNombreArticulo() == null || partida.getNombreArticulo().isEmpty()){
                 throw new RuntimeException("No se especifico el nombre del articulo");
             }
 
-            //CANTIDAD
             Integer cantidad = partida.getCantidad();
             if(cantidad <= 0){
                 throw new RuntimeException("La cantidad debe ser mayor a 0");
             }
 
-            //PRECIO
             Double precio = partida.getPrecio();
             if(precio < 0.1){
                 throw new RuntimeException("El precio debe ser mayor a 0.1");
             }
 
-
-            //ID_FACTURA
             partida.setFactura(factura);
         }
-        validarFolio(factura.getFolio());
+
+        validarFormatoFolio(factura.getFolio());
 
         Map<String, Object> totales = calcularTotales(factura);
 
@@ -74,73 +64,6 @@ public class FacturaService {
         factura.setTotal((Double) totales.get("total"));
 
         return repoFactura.save(factura);
-    }
-
-    public void validarFolio(String folio){
-        String folioAnterior = "";
-
-
-        try{
-           folioAnterior = repoFactura.findUltimoFolio();
-        }catch(DataAccessException ex){
-            folioAnterior = null;
-        }
-
-        if (folio.matches("^F-\\d\\d\\d")) {
-            if(folioAnterior == null){
-                if(!folio.equalsIgnoreCase("F-001")){
-                    throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser: F-001");
-                }
-            }else{
-                Integer nuevaNumeracion = getNumeracion(folio);
-                Integer anteriorNumeracion = getNumeracion(folioAnterior);
-
-                if(nuevaNumeracion  != (anteriorNumeracion  + 1)){
-                    String ceros = "";
-
-                    for (int i = String.valueOf(anteriorNumeracion ).length(); i < 3;) {
-                        i++;
-                        ceros = ceros + "0";
-                    }
-
-                    throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser F-" + ceros + (anteriorNumeracion  + 1));
-                }
-            }
-        }else{
-            throw new RuntimeException("El formato del folio no es valido debe ser: F-000");
-        }
-    }
-
-    public Integer getNumeracion(String folio){
-        String[] salto = folio.split("-");
-        return Integer.parseInt(salto[1]);
-    }
-
-    public Map calcularTotales(Factura factura) {
-        double subtotal = 0.0;
-        double total = 0.0;
-
-        if (Objects.nonNull(factura.getPartidas()) && !factura.getPartidas().isEmpty()) {
-            for (Partida partida : factura.getPartidas()) {
-                int cantidad = partida.getCantidad();
-                double precio = partida.getPrecio();
-
-                if (cantidad > 0 && precio >= 0.1) {
-                    subtotal += cantidad * precio;
-                } else {
-                    throw new RuntimeException("Error en los valores de la partida. Cantidad o precio inválido.");
-                }
-            }
-            total = subtotal + (subtotal * 0.16);
-
-            factura.setSubtotal(Math.round(subtotal * 100) / 100.0);
-            factura.setTotal(Math.round(total * 100) / 100.0);
-        }
-        Map<String, Object> totales = new HashMap<>();
-        totales.put("subtotal", subtotal);
-        totales.put("total", total);
-
-        return totales;
     }
 
     public Factura updateFactura(Factura factura, Long id) {
@@ -193,6 +116,72 @@ public class FacturaService {
         depDB.setSubtotal((Double) totales.get("subtotal"));
         depDB.setTotal((Double) totales.get("total"));
         return repoFactura.save(depDB);
+    }
+
+    public void validarFormatoFolio(String folio){
+        String folioAnterior = "";
+
+        try{
+           folioAnterior = repoFactura.findUltimoFolio();
+        }catch(DataAccessException ex){
+            folioAnterior = null;
+        }
+
+        if (folio.matches("^F-\\d\\d\\d")) {
+            if(folioAnterior == null){
+                if(!folio.equalsIgnoreCase("F-001")){
+                    throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser: F-001");
+                }
+            }else{
+                Integer nuevaNumeracion = getNumeracionFolio(folio);
+                Integer anteriorNumeracion = getNumeracionFolio(folioAnterior);
+
+                if(nuevaNumeracion  != (anteriorNumeracion  + 1)){
+                    String ceros = "";
+
+                    for (int i = String.valueOf(anteriorNumeracion ).length(); i < 3;) {
+                        i++;
+                        ceros = ceros + "0";
+                    }
+
+                    throw new RuntimeException("El formato del folio no es valido. La nuemracion debe ser F-" + ceros + (anteriorNumeracion  + 1));
+                }
+            }
+        }else{
+            throw new RuntimeException("El formato del folio no es valido debe ser: F-000");
+        }
+    }
+
+    public Integer getNumeracionFolio(String folio){
+        String[] salto = folio.split("-");
+        return Integer.parseInt(salto[1]);
+    }
+
+    public Map calcularTotales(Factura factura) {
+        double subtotal = 0.0;
+        double total = 0.0;
+
+        if (Objects.nonNull(factura.getPartidas()) && !factura.getPartidas().isEmpty()) {
+            for (Partida partida : factura.getPartidas()) {
+                int cantidad = partida.getCantidad();
+                double precio = partida.getPrecio();
+
+                if (cantidad > 0 && precio >= 0.1) {
+                    subtotal += cantidad * precio;
+                } else {
+                    throw new RuntimeException("Error en los valores de la partida. Cantidad o precio inválido.");
+                }
+            }
+            total = subtotal + (subtotal * 0.16);
+        }else{
+            throw new RuntimeException("Error en los valores de la partida.");
+        }
+
+        Map<String, Object> totales = new HashMap<>();
+        totales.put("subtotal", Math.round(subtotal * 100) /100d);
+        totales.put("total", Math.round(total * 100) /100d);
+
+        return totales;
     }
 
 }

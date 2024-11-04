@@ -2,11 +2,10 @@ package com.ServidorFacturas.factura;
 
 import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaDTO;
+import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/facturas")
 public class FacturaController {
+
     @Autowired
     private FacturaRepository repoFactura;
 
@@ -29,7 +29,6 @@ public class FacturaController {
 
     @GetMapping("/anterior")
     public ResponseEntity<String> getUltimo(){
-
         try{
             String folio = repoFactura.findUltimoFolio();
             return ResponseEntity.ok(folio);
@@ -48,12 +47,10 @@ public class FacturaController {
         return ResponseEntity.ok(toDTO(factura));
     }
 
-
-
     @GetMapping("/{id}")
-    public FacturaDTO getByID(@PathVariable Long id){
-        Factura entidad = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
-        return toDTO(entidad);
+    public FacturaDTO getById(@PathVariable Long id){
+        Factura factura = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
+        return toDTO(factura);
     }
 
     @PostMapping
@@ -64,14 +61,15 @@ public class FacturaController {
     }
 
     @PutMapping("/{id}")
-    public FacturaDTO updateFactura(@RequestBody FacturaDTO facturaDTO, @PathVariable Long id){
+    public FacturaDTO update(@RequestBody FacturaDTO facturaDTO, @PathVariable Long id){
         Factura factura = toEntity(facturaDTO);
         Factura modificada = serviceFactura.updateFactura(factura ,id);
+
         return toDTO(modificada);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteFacturaById(@PathVariable Long id){
+    public String deleteById(@PathVariable Long id){
         repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
         repoFactura.deleteById(id);
         return "Se elinimo la factura con id " + id;
