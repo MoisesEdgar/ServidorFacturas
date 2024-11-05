@@ -1,5 +1,7 @@
 package com.ServidorFacturas.factura;
 
+import com.ServidorFacturas.cliente.Cliente;
+import com.ServidorFacturas.cliente.ClienteDTO;
 import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaDTO;
 import org.springframework.http.ResponseEntity;
@@ -69,10 +71,10 @@ public class FacturaController {
 
     @DeleteMapping("/{id}")
     public String deleteById(@PathVariable Long id){
-        repoFactura.findById(id).orElseThrow(() -> new RuntimeException("No se encontro la factura con el id " + id));
         repoFactura.deleteById(id);
         return "Se elinimo la factura con id " + id;
     }
+
 
     private FacturaDTO toDTO(Factura factura){
        FacturaDTO dto = new FacturaDTO();
@@ -81,7 +83,16 @@ public class FacturaController {
         dto.fecha_expedicion = factura.getFechaExpedicion();
         dto.subtotal = factura.getSubtotal();
         dto.total = factura.getTotal();
-        dto.cliente_id = factura.getClienteId();
+
+        ClienteDTO cDTO = new ClienteDTO();
+
+        cDTO.id = factura.getCliente().getId();
+        cDTO.nombre = factura.getCliente().getNombre();
+        cDTO.codigo = factura.getCliente().getCodigo();
+        cDTO.telefono = factura.getCliente().getTelefono();
+        cDTO.direccion = factura.getCliente().getDireccion();
+        dto.cliente = cDTO;
+
         if (factura.getPartidas() != null){
             dto.partidas = new ArrayList<>();
 
@@ -92,7 +103,6 @@ public class FacturaController {
                 pDTO.cantidad = partida.getCantidad();
                 pDTO.precio = partida.getPrecio();
                 pDTO.factura_id = factura.getId();
-
                 dto.partidas.add(pDTO);
             }
         }
@@ -106,7 +116,16 @@ public class FacturaController {
         factura.setFechaExpedicion(dto.fecha_expedicion);
         factura.setSubtotal(dto.subtotal);
         factura.setTotal(dto.total);
-        factura.setClienteId(dto.cliente_id);
+
+        Cliente cliente = new Cliente();
+
+        cliente.setId(dto.cliente.id);
+        cliente.setCodigo(dto.cliente.codigo);
+        cliente.setNombre(dto.cliente.nombre);
+        cliente.setTelefono(dto.cliente.telefono);
+        cliente.setDireccion(dto.cliente.direccion);
+
+        factura.setCliente(cliente);
 
         if(dto.partidas != null){
             factura.setPartidas(new ArrayList<>());

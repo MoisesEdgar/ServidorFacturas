@@ -1,5 +1,7 @@
 package com.ServidorFacturas.factura;
 
+
+import com.ServidorFacturas.cliente.ClienteDTO;
 import com.ServidorFacturas.partida.PartidaDTO;
 
 import java.util.Date;
@@ -11,7 +13,7 @@ public class FacturaDTO {
     public Date fecha_expedicion;
     public Double subtotal;
     public Double total;
-    public Long cliente_id;
+    public ClienteDTO cliente;
     public List<PartidaDTO> partidas;
 
 }

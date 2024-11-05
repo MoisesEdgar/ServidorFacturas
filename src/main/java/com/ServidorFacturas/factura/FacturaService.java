@@ -30,11 +30,11 @@ public class FacturaService {
 
         factura.setFechaExpedicion(new Date());
 
-        if(factura.getClienteId() == null){
+        if(factura.getCliente().getId() == null){
             throw new RuntimeException("No se especifico el id del cliente");
         }else{
-           Long id = factura.getClienteId();
-           repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el Cliente con el id " + id));
+           Long id = factura.getCliente().getId();
+           factura.setCliente(repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el Cliente con el id " + id)));
         }
 
         for (Partida partida : factura.getPartidas()) {
@@ -67,8 +67,8 @@ public class FacturaService {
     }
 
     public Factura updateFactura(Factura factura, Long id) {
-        Factura depDB = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
-        List<Partida> partidasActuales = new ArrayList<>(depDB.getPartidas());
+        Factura facturaActual = repoFactura.findById(id).orElseThrow(() -> new RuntimeException("Factura no encontrada"));
+        List<Partida> partidasActuales = new ArrayList<>(facturaActual.getPartidas());
         List<Long> idsPartidas = new ArrayList<>();
 
 
@@ -96,9 +96,9 @@ public class FacturaService {
                     idsPartidas.add(partida.getId());
                 }
             } else {
-                partida.setFactura(depDB);
+                partida.setFactura(facturaActual);
                 Partida nuevaPartida = repoPartida.save(partida);
-                depDB.getPartidas().add(nuevaPartida);
+                facturaActual.getPartidas().add(nuevaPartida);
             }
         }
 
@@ -109,16 +109,16 @@ public class FacturaService {
                 .collect(Collectors.toList());
 
 
-        depDB.getPartidas().removeIf(partidaActual -> idsEliminar.contains(partidaActual.getId()));
+        facturaActual.getPartidas().removeIf(partidaActual -> idsEliminar.contains(partidaActual.getId()));
 
-        Map<String, Object> totales = calcularTotales(depDB);
+        Map<String, Object> totales = calcularTotales(facturaActual);
 
-        depDB.setSubtotal((Double) totales.get("subtotal"));
-        depDB.setTotal((Double) totales.get("total"));
-        return repoFactura.save(depDB);
+        facturaActual.setSubtotal((Double) totales.get("subtotal"));
+        facturaActual.setTotal((Double) totales.get("total"));
+        return repoFactura.save(facturaActual);
     }
 
-    public void validarFormatoFolio(String folio){
+    private void validarFormatoFolio(String folio){
         String folioAnterior = "";
 
         try{
@@ -152,12 +152,12 @@ public class FacturaService {
         }
     }
 
-    public Integer getNumeracionFolio(String folio){
+    private Integer getNumeracionFolio(String folio){
         String[] salto = folio.split("-");
         return Integer.parseInt(salto[1]);
     }
 
-    public Map calcularTotales(Factura factura) {
+    private Map calcularTotales(Factura factura) {
         double subtotal = 0.0;
         double total = 0.0;
 

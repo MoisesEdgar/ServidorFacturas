@@ -1,5 +1,6 @@
 package com.ServidorFacturas.factura;
 
+import com.ServidorFacturas.cliente.Cliente;
 import com.ServidorFacturas.partida.Partida;
 import jakarta.persistence.*;
 
@@ -13,24 +14,26 @@ public class Factura {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     private Long id;
     private String folio;
-    @Column(name = "fecha-expedicion")
+    @Column(name = "fecha_expedicion")
     @Temporal(TemporalType.DATE)
     private Date fechaExpedicion;
     private Double subtotal;
     private Double total;
-    @Column(name = "cliente-id")
+
+    @ManyToOne
+    @JoinColumn(name = "cliente", nullable = false)
     @Temporal(TemporalType.DATE)
-    private Long clienteId;
+    private Cliente cliente;
 
     @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Partida> partidas;
 
-    public Long getClienteId() {
-        return clienteId;
+    public Cliente getCliente() {
+        return cliente;
     }
 
-    public void setClienteId(Long clienteId) {
-        this.clienteId = clienteId;
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
     public List<Partida> getPartidas() {

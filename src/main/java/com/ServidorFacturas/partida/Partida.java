@@ -9,7 +9,7 @@ public class Partida {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     private Long id;
-    @Column(name = "nombre-articulo")
+    @Column(name = "nombre_articulo")
     @Temporal(TemporalType.DATE)
     private String nombreArticulo;
     private Integer cantidad;

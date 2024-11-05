@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class ClienteService {
 
     @Autowired
-    ClienteRepository repoCliente;
+    private ClienteRepository repoCliente;
 
     public Cliente guardar(Cliente cliente){
 
