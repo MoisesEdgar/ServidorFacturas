@@ -20,7 +20,6 @@ public class ClienteController {
         return toDTO(cliente);
     }
 
-
     @GetMapping("/nombre")
     public ResponseEntity<ClienteDTO> getByNombre(@RequestParam String nombre){
         Cliente cliente = repoCliente.findByNombre(nombre).orElse(null);
@@ -76,4 +75,5 @@ public class ClienteController {
 
         return cliente;
     }
+
 }

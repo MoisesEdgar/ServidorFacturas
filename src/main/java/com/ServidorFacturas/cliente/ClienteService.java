@@ -2,7 +2,6 @@ package com.ServidorFacturas.cliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 
 @Service
@@ -30,66 +29,35 @@ public class ClienteService {
             throw new RuntimeException("No se especifico la direccion del cliente");
         }
 
-        String codigo = crearCodigo(cliente.getNombre());
+        String codigo = crearCodigo();
         cliente.setCodigo(codigo);
 
         return repoCliente.save(cliente);
     }
 
-    public String crearCodigo(String nombre){
-//
-//        Cliente clienteAnterior = repoCliente.findByNombre(nombre).orElse(null);
-//
-//        String codigoAnterior = "";
-//        String codigo = "";
-//
-//        Integer tabla = repoCliente.tamanoTabla();
-//
-//        if(tabla == 0){
-//            codigo = "C-001";
-//        }else{
-//            codigoAnterior = clienteAnterior.getCodigo();
-//
-//            String[] salto = codigoAnterior.split("-");
-//
-//            Integer cont = Integer.parseInt(salto[1]);
-//            String ceros = "";
-//
-//            for (int i = String.valueOf(cont).length(); i < 3;) {
-//                i++;
-//                ceros = ceros + "0";
-//            }
-//
-//            codigo = "C-" + ceros + (Integer.parseInt(salto[1]) + 1);
-//        }
-//        return codigo;
+    public String crearCodigo(){
 
-        List<Cliente> clientes = repoCliente.findAll();
+            String codigoAnterior = "";
+            String codigo = "";
 
-        String codigoAnterior = "";
-        String codigo = "";
+            if(repoCliente.count() == 0){
+                codigo = "C-001";
+            }else{
+                codigoAnterior = repoCliente.findUltimoCodigo().orElse("C-001");
 
-        if(clientes.isEmpty()){
-            codigo = "C-001";
-        }else{
-            Integer ultimo = clientes.size();
-            Cliente cliente = clientes.get(ultimo-1);
+                String[] numeracion = codigoAnterior.split("-");
 
-            codigoAnterior = cliente.getCodigo();
+                Integer cont = Integer.parseInt(numeracion[1]);
+                String ceros = "";
 
-            String[] salto = codigoAnterior.split("-");
+                for (int i = String.valueOf(cont).length(); i < 3;) {
+                    i++;
+                    ceros = ceros + "0";
+                }
 
-            Integer cont = Integer.parseInt(salto[1]);
-            String ceros = "";
-
-            for (int i = String.valueOf(cont).length(); i < 3;) {
-                i++;
-                ceros = ceros + "0";
+                codigo = "C-" + ceros + (Integer.parseInt(numeracion[1]) + 1);
             }
-
-            codigo = "C-" + ceros + (Integer.parseInt(salto[1]) + 1);
-        }
-        return codigo;
+            return codigo;
 
     }
 

@@ -28,14 +28,13 @@ public class FacturaController {
     }
 
     @GetMapping("/anterior")
-    public ResponseEntity<String> getUltimo(){
+    public ResponseEntity<String> getUltimoFolio(){
         try{
             String folio = repoFactura.findUltimoFolio();
             return ResponseEntity.ok(folio);
         }catch(DataAccessException ex){
             return ResponseEntity.notFound().build();
         }
-
     }
 
     @GetMapping("/folio")
