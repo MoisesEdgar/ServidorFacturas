@@ -22,7 +22,6 @@ public class Factura {
 
     @ManyToOne
     @JoinColumn(name = "cliente", nullable = false)
-    @Temporal(TemporalType.DATE)
     private Cliente cliente;
 
     @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -58,10 +58,10 @@ public class FacturaService {
 
         validarFormatoFolio(factura.getFolio());
 
-        Map<String, Object> totales = calcularTotales(factura);
+        Map<String, Double> totales = calcularTotales(factura);
 
-        factura.setSubtotal((Double) totales.get("subtotal"));
-        factura.setTotal((Double) totales.get("total"));
+        factura.setSubtotal(totales.get("subtotal"));
+        factura.setTotal(totales.get("total"));
 
         return repoFactura.save(factura);
     }
@@ -111,10 +111,10 @@ public class FacturaService {
 
         facturaActual.getPartidas().removeIf(partidaActual -> idsEliminar.contains(partidaActual.getId()));
 
-        Map<String, Object> totales = calcularTotales(facturaActual);
+        Map<String, Double> totales = calcularTotales(facturaActual);
 
-        facturaActual.setSubtotal((Double) totales.get("subtotal"));
-        facturaActual.setTotal((Double) totales.get("total"));
+        facturaActual.setSubtotal(totales.get("subtotal"));
+        facturaActual.setTotal(totales.get("total"));
         return repoFactura.save(facturaActual);
     }
 
@@ -157,7 +157,7 @@ public class FacturaService {
         return Integer.parseInt(salto[1]);
     }
 
-    private Map calcularTotales(Factura factura) {
+    private Map<String, Double> calcularTotales(Factura factura) {
         double subtotal = 0.0;
         double total = 0.0;
 
@@ -177,7 +177,7 @@ public class FacturaService {
             throw new RuntimeException("Error en los valores de la partida.");
         }
 
-        Map<String, Object> totales = new HashMap<>();
+        Map<String, Double> totales = new HashMap<>();
         totales.put("subtotal", Math.round(subtotal * 100) /100d);
         totales.put("total", Math.round(total * 100) /100d);
 

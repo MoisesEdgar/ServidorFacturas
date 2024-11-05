@@ -1,6 +1,5 @@
 package com.ServidorFacturas.factura;
 
-
 import com.ServidorFacturas.cliente.ClienteDTO;
 import com.ServidorFacturas.partida.PartidaDTO;
 
@@ -15,5 +14,4 @@ public class FacturaDTO {
     public Double total;
     public ClienteDTO cliente;
     public List<PartidaDTO> partidas;
-
 }

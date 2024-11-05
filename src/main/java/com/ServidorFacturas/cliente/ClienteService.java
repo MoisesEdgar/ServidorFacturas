@@ -35,7 +35,7 @@ public class ClienteService {
         return repoCliente.save(cliente);
     }
 
-    public String crearCodigo(){
+    private String crearCodigo(){
 
             String codigoAnterior = "";
             String codigo = "";
