@@ -2,6 +2,8 @@ package com.ServidorFacturas.factura;
 
 import com.ServidorFacturas.cliente.Cliente;
 import com.ServidorFacturas.cliente.ClienteDTO;
+import com.ServidorFacturas.cliente.ClienteRepository;
+import com.ServidorFacturas.cliente.ClienteService;
 import com.ServidorFacturas.partida.Partida;
 import com.ServidorFacturas.partida.PartidaDTO;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,9 @@ public class FacturaController {
 
     @Autowired
     private FacturaService serviceFactura;
+
+    @Autowired
+    private ClienteRepository repoCliente;
 
     @GetMapping
     public List<FacturaDTO> getAll(){
@@ -83,15 +88,8 @@ public class FacturaController {
         dto.fecha_expedicion = factura.getFechaExpedicion();
         dto.subtotal = factura.getSubtotal();
         dto.total = factura.getTotal();
-
-        ClienteDTO cDTO = new ClienteDTO();
-
-        cDTO.id = factura.getCliente().getId();
-        cDTO.nombre = factura.getCliente().getNombre();
-        cDTO.codigo = factura.getCliente().getCodigo();
-        cDTO.telefono = factura.getCliente().getTelefono();
-        cDTO.direccion = factura.getCliente().getDireccion();
-        dto.cliente = cDTO;
+        Cliente cliente = factura.getCliente();
+        dto.cliente_id = cliente.getId();
 
         if (factura.getPartidas() != null){
             dto.partidas = new ArrayList<>();
@@ -117,14 +115,7 @@ public class FacturaController {
         factura.setSubtotal(dto.subtotal);
         factura.setTotal(dto.total);
 
-        Cliente cliente = new Cliente();
-
-        cliente.setId(dto.cliente.id);
-        cliente.setCodigo(dto.cliente.codigo);
-        cliente.setNombre(dto.cliente.nombre);
-        cliente.setTelefono(dto.cliente.telefono);
-        cliente.setDireccion(dto.cliente.direccion);
-
+        Cliente cliente = repoCliente.findById(dto.cliente_id).orElseThrow(()-> new RuntimeException("No se encontro un cliente con el id: " + dto.cliente_id));
         factura.setCliente(cliente);
 
         if(dto.partidas != null){

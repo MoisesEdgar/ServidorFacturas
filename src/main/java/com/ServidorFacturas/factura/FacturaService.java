@@ -30,13 +30,6 @@ public class FacturaService {
 
         factura.setFechaExpedicion(new Date());
 
-        if(factura.getCliente().getId() == null){
-            throw new RuntimeException("No se especifico el id del cliente");
-        }else{
-           Long id = factura.getCliente().getId();
-           factura.setCliente(repoCliente.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el Cliente con el id " + id)));
-        }
-
         for (Partida partida : factura.getPartidas()) {
 
             if(partida.getNombreArticulo() == null || partida.getNombreArticulo().isEmpty()){
